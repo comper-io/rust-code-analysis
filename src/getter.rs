@@ -576,3 +576,5 @@ impl Getter for JavaCode {
 }
 
 impl Getter for KotlinCode {}
+
+impl Getter for PerlCode {}

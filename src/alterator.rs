@@ -148,3 +148,5 @@ impl Alterator for RustCode {
         }
     }
 }
+
+impl Alterator for PerlCode {}

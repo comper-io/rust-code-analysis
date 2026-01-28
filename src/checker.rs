@@ -703,3 +703,45 @@ impl Checker for KotlinCode {
         false
     }
 }
+
+impl Checker for PerlCode {
+    fn is_comment(_: &Node) -> bool {
+        false
+    }
+
+    fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
+        false
+    }
+
+    fn is_func_space(_: &Node) -> bool {
+        false
+    }
+
+    fn is_func(_: &Node) -> bool {
+        false
+    }
+
+    fn is_closure(_: &Node) -> bool {
+        false
+    }
+
+    fn is_call(_: &Node) -> bool {
+        false
+    }
+
+    fn is_non_arg(_: &Node) -> bool {
+        false
+    }
+
+    fn is_string(_: &Node) -> bool {
+        false
+    }
+
+    fn is_else_if(_: &Node) -> bool {
+        false
+    }
+
+    fn is_primitive(_id: u16) -> bool {
+        false
+    }
+}
