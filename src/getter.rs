@@ -577,4 +577,15 @@ impl Getter for JavaCode {
 
 impl Getter for KotlinCode {}
 
-impl Getter for PerlCode {}
+impl Getter for PerlCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use crate::languages::Perl::*;
+        
+        match node.kind_id().into() {
+            SourceFile => SpaceKind::Unit,
+            SubroutineDeclarationStatement | MethodDeclarationStatement => SpaceKind::Function,
+            ClassStatement => SpaceKind::Class,
+            _ => SpaceKind::Unknown,
+        }
+    }
+}

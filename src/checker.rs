@@ -713,8 +713,9 @@ impl Checker for PerlCode {
         false
     }
 
-    fn is_func_space(_: &Node) -> bool {
-        false
+    fn is_func_space(node: &Node) -> bool {
+        use crate::languages::Perl::*;
+        matches!(node.kind_id().into(), SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement)
     }
 
     fn is_func(_: &Node) -> bool {
