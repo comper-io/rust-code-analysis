@@ -704,6 +704,132 @@ impl Checker for KotlinCode {
     }
 }
 
+impl Checker for HtmlCode {
+    fn is_comment(_: &Node) -> bool {
+        false
+    }
+
+    fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
+        false
+    }
+
+    fn is_func_space(_: &Node) -> bool {
+        false
+    }
+
+    fn is_func(_: &Node) -> bool {
+        false
+    }
+
+    fn is_closure(_: &Node) -> bool {
+        false
+    }
+
+    fn is_call(_: &Node) -> bool {
+        false
+    }
+
+    fn is_non_arg(_: &Node) -> bool {
+        false
+    }
+
+    fn is_string(_: &Node) -> bool {
+        false
+    }
+
+    fn is_else_if(_: &Node) -> bool {
+        false
+    }
+
+    fn is_primitive(_id: u16) -> bool {
+        false
+    }
+}
+
+impl Checker for PhpCode {
+    fn is_comment(_: &Node) -> bool {
+        false
+    }
+
+    fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
+        false
+    }
+
+    fn is_func_space(_: &Node) -> bool {
+        false
+    }
+
+    fn is_func(_: &Node) -> bool {
+        false
+    }
+
+    fn is_closure(_: &Node) -> bool {
+        false
+    }
+
+    fn is_call(_: &Node) -> bool {
+        false
+    }
+
+    fn is_non_arg(_: &Node) -> bool {
+        false
+    }
+
+    fn is_string(_: &Node) -> bool {
+        false
+    }
+
+    fn is_else_if(_: &Node) -> bool {
+        false
+    }
+
+    fn is_primitive(_id: u16) -> bool {
+        false
+    }
+}
+
+impl Checker for CsharpCode {
+    fn is_comment(_: &Node) -> bool {
+        false
+    }
+
+    fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
+        false
+    }
+
+    fn is_func_space(_: &Node) -> bool {
+        false
+    }
+
+    fn is_func(_: &Node) -> bool {
+        false
+    }
+
+    fn is_closure(_: &Node) -> bool {
+        false
+    }
+
+    fn is_call(_: &Node) -> bool {
+        false
+    }
+
+    fn is_non_arg(_: &Node) -> bool {
+        false
+    }
+
+    fn is_string(_: &Node) -> bool {
+        false
+    }
+
+    fn is_else_if(_: &Node) -> bool {
+        false
+    }
+
+    fn is_primitive(_id: u16) -> bool {
+        false
+    }
+}
+
 impl Checker for PerlCode {
     fn is_comment(_: &Node) -> bool {
         false
@@ -715,7 +841,10 @@ impl Checker for PerlCode {
 
     fn is_func_space(node: &Node) -> bool {
         use crate::languages::Perl::*;
-        matches!(node.kind_id().into(), SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement)
+        matches!(
+            node.kind_id().into(),
+            SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement
+        )
     }
 
     fn is_func(_: &Node) -> bool {

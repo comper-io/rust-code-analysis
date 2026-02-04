@@ -857,7 +857,16 @@ impl Loc for JavaCode {
     }
 }
 
-implement_metric_trait!(Loc, PreprocCode, CcommentCode, KotlinCode, PerlCode);
+implement_metric_trait!(
+    Loc,
+    PreprocCode,
+    CcommentCode,
+    KotlinCode,
+    PerlCode,
+    HtmlCode,
+    PhpCode,
+    CsharpCode
+);
 
 #[cfg(test)]
 mod tests {

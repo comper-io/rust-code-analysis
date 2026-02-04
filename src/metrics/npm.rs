@@ -203,6 +203,18 @@ where
     fn compute(node: &Node, stats: &mut Stats);
 }
 
+impl Npm for HtmlCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
+impl Npm for PhpCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
+impl Npm for CsharpCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl Npm for JavaCode {
     fn compute(node: &Node, stats: &mut Stats) {
         use Java::*;

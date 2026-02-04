@@ -150,3 +150,9 @@ impl Alterator for RustCode {
 }
 
 impl Alterator for PerlCode {}
+
+impl Alterator for HtmlCode {}
+
+impl Alterator for PhpCode {}
+
+impl Alterator for CsharpCode {}

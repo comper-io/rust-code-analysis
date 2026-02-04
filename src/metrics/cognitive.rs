@@ -490,7 +490,16 @@ impl Cognitive for JavaCode {
     }
 }
 
-implement_metric_trait!(Cognitive, PreprocCode, CcommentCode, KotlinCode, PerlCode);
+implement_metric_trait!(
+    Cognitive,
+    PreprocCode,
+    CcommentCode,
+    KotlinCode,
+    PerlCode,
+    HtmlCode,
+    PhpCode,
+    CsharpCode
+);
 
 #[cfg(test)]
 mod tests {

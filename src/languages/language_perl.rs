@@ -493,7 +493,6 @@ pub enum Perl {
     StringContent = 486,
     TransliterationContent = 487,
     Error = 488,
-    
 }
 
 impl From<Perl> for &'static str {
@@ -739,7 +738,9 @@ impl From<Perl> for &'static str {
             Perl::MatchRegexpModifiers => "match_regexp_modifiers",
             Perl::SubstitutionRegexpModifiers => "substitution_regexp_modifiers",
             Perl::TransliterationModifiers => "transliteration_modifiers",
-            Perl::InterpolatedTransliterationContentToken1 => "_interpolated_transliteration_content_token1",
+            Perl::InterpolatedTransliterationContentToken1 => {
+                "_interpolated_transliteration_content_token1"
+            }
             Perl::Tr => "tr",
             Perl::Y => "y",
             Perl::Version => "version",
@@ -972,7 +973,9 @@ impl From<Perl> for &'static str {
             Perl::Boolean => "boolean",
             Perl::SourceFileRepeat1 => "source_file_repeat1",
             Perl::SignatureRepeat1 => "signature_repeat1",
-            Perl::SubroutineDeclarationStatementRepeat1 => "subroutine_declaration_statement_repeat1",
+            Perl::SubroutineDeclarationStatementRepeat1 => {
+                "subroutine_declaration_statement_repeat1"
+            }
             Perl::ForInitializerRepeat1 => "_for_initializer_repeat1",
             Perl::TermRightwardRepeat1 => "_term_rightward_repeat1",
             Perl::DeclVariableListRepeat1 => "_decl_variable_list_repeat1",
@@ -989,7 +992,6 @@ impl From<Perl> for &'static str {
             Perl::StringContent => "string_content",
             Perl::TransliterationContent => "transliteration_content",
             Perl::Error => "ERROR",
-            
         }
     }
 }

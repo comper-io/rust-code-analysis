@@ -328,7 +328,16 @@ impl Halstead for JavaCode {
     }
 }
 
-implement_metric_trait!(Halstead, KotlinCode, PreprocCode, CcommentCode, PerlCode);
+implement_metric_trait!(
+    Halstead,
+    KotlinCode,
+    PreprocCode,
+    CcommentCode,
+    PerlCode,
+    HtmlCode,
+    PhpCode,
+    CsharpCode
+);
 
 #[cfg(test)]
 mod tests {

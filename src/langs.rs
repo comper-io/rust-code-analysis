@@ -136,6 +136,36 @@ mk_langs!(
         tree_sitter_perl,
         [pl, pm, t, pod],
         ["perl", "cperl"]
+    ),
+    (
+        Html,
+        "The `HTML` language",
+        "html",
+        HtmlCode,
+        HtmlParser,
+        tree_sitter_html,
+        [html, htm],
+        ["html", "html5"]
+    ),
+    (
+        Php,
+        "The `PHP` language",
+        "php",
+        PhpCode,
+        PhpParser,
+        tree_sitter_php,
+        [php, php3, php4, php5, phtml],
+        ["php"]
+    ),
+    (
+        Csharp,
+        "The `C#` language",
+        "c#",
+        CsharpCode,
+        CsharpParser,
+        tree_sitter_c_sharp,
+        [cs, csx],
+        ["csharp", "c#"]
     )
 );
 

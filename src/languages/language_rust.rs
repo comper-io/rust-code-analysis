@@ -722,7 +722,6 @@ impl From<Rust> for &'static str {
             Rust::ShorthandFieldIdentifier => "shorthand_field_identifier",
             Rust::TypeIdentifier => "type_identifier",
             Rust::Error => "ERROR",
-            
         }
     }
 }

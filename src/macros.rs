@@ -11,6 +11,9 @@ macro_rules! get_language {
     (tree_sitter_kotlin_codanna) => {
         tree_sitter_kotlin_codanna::language().into()
     };
+    (tree_sitter_php) => {
+        tree_sitter_php::LANGUAGE_PHP.into()
+    };
     ($name:ident) => {
         $name::LANGUAGE.into()
     };

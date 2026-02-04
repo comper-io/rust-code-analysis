@@ -560,7 +560,6 @@ impl From<Python> for &'static str {
             Python::AsPatternTarget => "as_pattern_target",
             Python::FormatExpression => "format_expression",
             Python::Error => "ERROR",
-            
         }
     }
 }

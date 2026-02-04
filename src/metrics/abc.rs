@@ -361,6 +361,18 @@ implement_metric_trait!(
 // Source: https://www.softwarerenovation.com/Articles.aspx
 // ABC Java rules: (page 8, figure 4)
 // ABC Java example: (page 15, listing 4)
+impl Abc for HtmlCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
+impl Abc for PhpCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
+impl Abc for CsharpCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl Abc for JavaCode {
     fn compute(node: &Node, stats: &mut Stats) {
         use Java::*;

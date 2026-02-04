@@ -124,6 +124,18 @@ where
     fn compute(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats);
 }
 
+impl Wmc for HtmlCode {
+    fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
+}
+
+impl Wmc for PhpCode {
+    fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
+}
+
+impl Wmc for CsharpCode {
+    fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
+}
+
 impl Wmc for JavaCode {
     fn compute(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats) {
         use SpaceKind::*;
