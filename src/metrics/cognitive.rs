@@ -490,15 +490,101 @@ impl Cognitive for JavaCode {
     }
 }
 
+impl Cognitive for HtmlCode {
+    fn compute(
+        node: &Node,
+        stats: &mut Stats,
+        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        use Html::*;
+
+        let (mut nesting, depth, lambda) = get_nesting_from_map(node, nesting_map);
+
+        match node.kind_id().into() {
+            Element | ScriptElement | StyleElement => {
+                stats.structural += nesting + 1;
+                nesting += 1;
+            }
+            _ => {}
+        }
+        nesting_map.insert(node.id(), (nesting, depth, lambda));
+    }
+}
+
+impl Cognitive for PhpCode {
+    fn compute(
+        node: &Node,
+        stats: &mut Stats,
+        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        use Php::*;
+
+        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+
+        match node.kind_id().into() {
+            IfStatement | ForStatement | ForeachStatement | WhileStatement | DoStatement
+            | SwitchStatement | CatchClause | ConditionalExpression => {
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            ElseIfClause | ElseIfClause2 | ElseClause | ElseClause2 | FinallyClause => {
+                increment_by_one(stats);
+            }
+            BinaryExpression => {
+                compute_booleans::<Php>(node, stats, AMPAMP, PIPEPIPE);
+            }
+            AnonymousFunction | ArrowFunction => {
+                lambda += 1;
+            }
+            FunctionDefinition | MethodDeclaration => {
+                nesting = 0;
+                increment_function_depth::<Php>(&mut depth, node, FunctionDefinition);
+            }
+            _ => {}
+        }
+        nesting_map.insert(node.id(), (nesting, depth, lambda));
+    }
+}
+
+impl Cognitive for CsharpCode {
+    fn compute(
+        node: &Node,
+        stats: &mut Stats,
+        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        use Csharp::*;
+
+        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+
+        match node.kind_id().into() {
+            IfStatement | ForStatement | ForeachStatement | WhileStatement | DoStatement
+            | SwitchStatement | CatchClause | ConditionalExpression => {
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            Else | FinallyClause => {
+                increment_by_one(stats);
+            }
+            BinaryExpression => {
+                compute_booleans::<Csharp>(node, stats, AMPAMP, PIPEPIPE);
+            }
+            LambdaExpression | AnonymousMethodExpression => {
+                lambda += 1;
+            }
+            MethodDeclaration => {
+                nesting = 0;
+                increment_function_depth::<Csharp>(&mut depth, node, MethodDeclaration);
+            }
+            _ => {}
+        }
+        nesting_map.insert(node.id(), (nesting, depth, lambda));
+    }
+}
+
 implement_metric_trait!(
     Cognitive,
     PreprocCode,
     CcommentCode,
     KotlinCode,
-    PerlCode,
-    HtmlCode,
-    PhpCode,
-    CsharpCode
+    PerlCode
 );
 
 #[cfg(test)]

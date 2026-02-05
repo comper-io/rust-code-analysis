@@ -577,11 +577,105 @@ impl Getter for JavaCode {
 
 impl Getter for KotlinCode {}
 
-impl Getter for HtmlCode {}
+impl Getter for HtmlCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use Html::*;
 
-impl Getter for PhpCode {}
+        match node.kind_id().into() {
+            Document => SpaceKind::Unit,
+            ScriptElement | StyleElement => SpaceKind::Function,
+            _ => SpaceKind::Unknown,
+        }
+    }
+}
 
-impl Getter for CsharpCode {}
+impl Getter for PhpCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use Php::*;
+
+        match node.kind_id().into() {
+            Program => SpaceKind::Unit,
+            FunctionDefinition | MethodDeclaration | AnonymousFunction | ArrowFunction => {
+                SpaceKind::Function
+            }
+            ClassDeclaration | AnonymousClass => SpaceKind::Class,
+            TraitDeclaration => SpaceKind::Trait,
+            InterfaceDeclaration => SpaceKind::Interface,
+            EnumDeclaration => SpaceKind::Unit,
+            _ => SpaceKind::Unknown,
+        }
+    }
+
+    fn get_op_type(node: &Node) -> HalsteadType {
+        use Php::*;
+        match node.kind_id().into() {
+            PLUS | DASH | TILDE | BANG | AT | Clone | COLONCOLON | Print | New | DASHDASH
+            | PLUSPLUS | STARSTAREQ | STAREQ | SLASHEQ | PERCENTEQ | PLUSEQ | DASHEQ | DOTEQ
+            | LTLTEQ | GTGTEQ | AMPEQ | CARETEQ | PIPEEQ | QMARKQMARKEQ | DASHGT | QMARKDASHGT
+            | EscapeSequence | EscapeSequence2 | DOLLAR | Yield | Yieldfrom | Instanceof
+            | QMARKQMARK | STARSTAR | And | Or | Xor | PIPEPIPE | AMPAMP | CARET | EQEQ | BANGEQ
+            | LTGT | EQEQEQ | BANGEQEQ | LT | GT | LTEQ | GTEQ | LTEQGT | PIPEGT | DOT | LTLT
+            | GTGT | STAR | SLASH | PERCENT | Include | IncludeOnce | Require | RequireOnce
+            | Echo | Exit | Unset | Declare | Enddeclare | Ticks | Encoding | StrictTypes
+            | Try | Catch | Finally | Goto | Continue | Break | Return | Throw | While
+            | Endwhile | Do | For | Endfor | Foreach | Endforeach | If | Endif | Elseif | Else
+            | Match | Default | Switch | Endswitch | EQ | COMMA | SEMI | COLON | QMARK
+            | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE => HalsteadType::Operator,
+
+            VariableName | DynamicVariableName | Name | QualifiedName | RelativeName | Name2
+            | String | Int | Float | Bool | Null | Null2 | Integer | Float2 | Boolean
+            | String2 | EncapsedString | Nowdoc | Heredoc => HalsteadType::Operand,
+
+            _ => HalsteadType::Unknown,
+        }
+    }
+
+    get_operator!(Php);
+}
+
+impl Getter for CsharpCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use Csharp::*;
+
+        match node.kind_id().into() {
+            CompilationUnit => SpaceKind::Unit,
+            MethodDeclaration | ConstructorDeclaration | DestructorDeclaration
+            | OperatorDeclaration | ConversionOperatorDeclaration | LocalFunctionStatement
+            | LambdaExpression | AnonymousMethodExpression => SpaceKind::Function,
+            ClassDeclaration | RecordDeclaration => SpaceKind::Class,
+            StructDeclaration => SpaceKind::Struct,
+            EnumDeclaration => SpaceKind::Unit,
+            InterfaceDeclaration => SpaceKind::Interface,
+            NamespaceDeclaration | FileScopedNamespaceDeclaration => SpaceKind::Namespace,
+            _ => SpaceKind::Unknown,
+        }
+    }
+
+    fn get_op_type(node: &Node) -> HalsteadType {
+        use Csharp::*;
+        match node.kind_id().into() {
+            EQ | LT | GT | QMARK | BANG | TILDE | PLUSPLUS | DASHDASH | PLUS | DASH | STAR
+            | SLASH | PERCENT | CARET | PIPE | AMP | LTLT | GTGT | GTGTGT | EQEQ | BANGEQ
+            | GTEQ | LTEQ | Is | As | New | Sizeof | Typeof | Checked | Unchecked | Await
+            | If | Else | Switch | Case | Default | Do | While | For | Foreach | Return
+            | Break | Continue | Goto | Throw | Try | Catch | Finally | Lock | Yield
+            | Using | Fixed | DOT | DASHGT | COLONCOLON | QMARKQMARK | And | Or | Not
+            | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | CARETEQ | PIPEEQ
+            | LTLTEQ | GTGTEQ | GTGTGTEQ | QMARKQMARKEQ | AMPAMP | PIPEPIPE
+            | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE | SEMI | COMMA | COLON
+            => HalsteadType::Operator,
+
+            Identifier | SimpleName | QualifiedName | GenericName
+            | Literal | IntegerLiteral | RealLiteral | StringLiteral | CharacterLiteral
+            | BooleanLiteral | NullLiteral | True | False | This | Base
+             => HalsteadType::Operand,
+
+            _ => HalsteadType::Unknown,
+        }
+    }
+
+    get_operator!(Csharp);
+}
 
 impl Getter for PerlCode {
     fn get_space_kind(node: &Node) -> SpaceKind {

@@ -221,15 +221,51 @@ impl Cyclomatic for JavaCode {
     }
 }
 
+impl Cyclomatic for HtmlCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use Html::*;
+
+        match node.kind_id().into() {
+            Element | ScriptElement | StyleElement => {
+                stats.cyclomatic += 1.;
+            }
+            _ => {}
+        }
+    }
+}
+
+impl Cyclomatic for PhpCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use Php::*;
+
+        match node.kind_id().into() {
+            If | For | Foreach | While | Do | Case | Catch | ConditionalExpression | AMPAMP | PIPEPIPE => {
+                stats.cyclomatic += 1.;
+            }
+            _ => {}
+        }
+    }
+}
+
+impl Cyclomatic for CsharpCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use Csharp::*;
+
+        match node.kind_id().into() {
+            If | For | Foreach | While | Do | Case | Catch | ConditionalExpression | AMPAMP | PIPEPIPE | QMARKQMARK => {
+                stats.cyclomatic += 1.;
+            }
+            _ => {}
+        }
+    }
+}
+
 implement_metric_trait!(
     Cyclomatic,
     KotlinCode,
     PreprocCode,
     CcommentCode,
-    PerlCode,
-    HtmlCode,
-    PhpCode,
-    CsharpCode
+    PerlCode
 );
 
 #[cfg(test)]

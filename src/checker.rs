@@ -705,16 +705,17 @@ impl Checker for KotlinCode {
 }
 
 impl Checker for HtmlCode {
-    fn is_comment(_: &Node) -> bool {
-        false
+    fn is_comment(node: &Node) -> bool {
+        node.kind_id() == Html::Comment
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
         false
     }
 
-    fn is_func_space(_: &Node) -> bool {
-        false
+    fn is_func_space(node: &Node) -> bool {
+        use Html::*;
+        matches!(node.kind_id().into(), Document | ScriptElement | StyleElement)
     }
 
     fn is_func(_: &Node) -> bool {
@@ -747,40 +748,63 @@ impl Checker for HtmlCode {
 }
 
 impl Checker for PhpCode {
-    fn is_comment(_: &Node) -> bool {
-        false
+    fn is_comment(node: &Node) -> bool {
+        node.kind_id() == Php::Comment
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
         false
     }
 
-    fn is_func_space(_: &Node) -> bool {
-        false
+    fn is_func_space(node: &Node) -> bool {
+        use Php::*;
+        matches!(
+            node.kind_id().into(),
+            Program
+                | FunctionDefinition
+                | MethodDeclaration
+                | AnonymousFunction
+                | ArrowFunction
+                | ClassDeclaration
+                | AnonymousClass
+                | TraitDeclaration
+                | InterfaceDeclaration
+        )
     }
 
-    fn is_func(_: &Node) -> bool {
-        false
+    fn is_func(node: &Node) -> bool {
+        use Php::*;
+        matches!(
+            node.kind_id().into(),
+            FunctionDefinition | MethodDeclaration | AnonymousFunction | ArrowFunction
+        )
     }
 
-    fn is_closure(_: &Node) -> bool {
-        false
+    fn is_closure(node: &Node) -> bool {
+        use Php::*;
+        matches!(node.kind_id().into(), AnonymousFunction | ArrowFunction)
     }
 
-    fn is_call(_: &Node) -> bool {
-        false
+    fn is_call(node: &Node) -> bool {
+        node.kind_id() == Php::FunctionCallExpression
     }
 
-    fn is_non_arg(_: &Node) -> bool {
-        false
+    fn is_non_arg(node: &Node) -> bool {
+        use Php::*;
+        matches!(
+            node.kind_id().into(),
+            LPAREN | LPAREN2 | COMMA | RPAREN | RPAREN2
+        )
     }
 
-    fn is_string(_: &Node) -> bool {
-        false
+    fn is_string(node: &Node) -> bool {
+        use Php::*;
+        matches!(node.kind_id().into(), String | EncapsedString | Heredoc | Nowdoc)
     }
 
-    fn is_else_if(_: &Node) -> bool {
-        false
+    fn is_else_if(node: &Node) -> bool {
+        use Php::*;
+        matches!(node.kind_id().into(), ElseIfClause | ElseIfClause2)
     }
 
     fn is_primitive(_id: u16) -> bool {
@@ -789,39 +813,85 @@ impl Checker for PhpCode {
 }
 
 impl Checker for CsharpCode {
-    fn is_comment(_: &Node) -> bool {
-        false
+    fn is_comment(node: &Node) -> bool {
+        node.kind_id() == Csharp::Comment
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
         false
     }
 
-    fn is_func_space(_: &Node) -> bool {
-        false
+    fn is_func_space(node: &Node) -> bool {
+        use Csharp::*;
+        matches!(
+            node.kind_id().into(),
+            CompilationUnit
+                | MethodDeclaration
+                | ConstructorDeclaration
+                | DestructorDeclaration
+                | OperatorDeclaration
+                | ConversionOperatorDeclaration
+                | LocalFunctionStatement
+                | LambdaExpression
+                | AnonymousMethodExpression
+                | ClassDeclaration
+                | RecordDeclaration
+                | StructDeclaration
+                | InterfaceDeclaration
+                | NamespaceDeclaration
+                | FileScopedNamespaceDeclaration
+        )
     }
 
-    fn is_func(_: &Node) -> bool {
-        false
+    fn is_func(node: &Node) -> bool {
+        use Csharp::*;
+        matches!(
+            node.kind_id().into(),
+            MethodDeclaration
+                | ConstructorDeclaration
+                | DestructorDeclaration
+                | OperatorDeclaration
+                | ConversionOperatorDeclaration
+                | LocalFunctionStatement
+                | LambdaExpression
+                | AnonymousMethodExpression
+        )
     }
 
-    fn is_closure(_: &Node) -> bool {
-        false
+    fn is_closure(node: &Node) -> bool {
+        use Csharp::*;
+        matches!(
+            node.kind_id().into(),
+            LambdaExpression | AnonymousMethodExpression
+        )
     }
 
-    fn is_call(_: &Node) -> bool {
-        false
+    fn is_call(node: &Node) -> bool {
+        node.kind_id() == Csharp::InvocationExpression
     }
 
-    fn is_non_arg(_: &Node) -> bool {
-        false
+    fn is_non_arg(node: &Node) -> bool {
+        use Csharp::*;
+        matches!(node.kind_id().into(), LPAREN | COMMA | RPAREN)
     }
 
-    fn is_string(_: &Node) -> bool {
-        false
+    fn is_string(node: &Node) -> bool {
+        use Csharp::*;
+        matches!(
+            node.kind_id().into(),
+            StringLiteral | VerbatimStringLiteral | RawStringLiteral | InterpolatedStringExpression
+        )
     }
 
-    fn is_else_if(_: &Node) -> bool {
+    fn is_else_if(node: &Node) -> bool {
+        if node.kind_id() != Csharp::IfStatement {
+            return false;
+        }
+        if let Some(parent) = node.parent() {
+            if parent.kind_id() == Csharp::Else {
+                return true;
+            }
+        }
         false
     }
 

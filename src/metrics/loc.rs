@@ -857,15 +857,73 @@ impl Loc for JavaCode {
     }
 }
 
+impl Loc for HtmlCode {
+    fn compute(node: &Node, stats: &mut Stats, is_func_space: bool, is_unit: bool) {
+        use Html::*;
+
+        let (start, end) = init(node, stats, is_func_space, is_unit);
+
+        match node.kind_id().into() {
+            Document | Element | StartTag | EndTag | TagName | Attribute | AttributeName
+            | AttributeValue | QuotedAttributeValue | Text | RawText | Doctype | Entity => {
+                check_comment_ends_on_code_line(stats, start);
+                stats.ploc.lines.insert(start);
+            }
+            Comment => {
+                add_cloc_lines(stats, start, end);
+            }
+            _ => {
+                check_comment_ends_on_code_line(stats, start);
+                stats.ploc.lines.insert(start);
+            }
+        }
+    }
+}
+
+impl Loc for PhpCode {
+    fn compute(node: &Node, stats: &mut Stats, is_func_space: bool, is_unit: bool) {
+        use Php::*;
+
+        let (start, end) = init(node, stats, is_func_space, is_unit);
+
+        match node.kind_id().into() {
+            Program | Statement | CompoundStatement | ExpressionStatement => {}
+            Comment => {
+                add_cloc_lines(stats, start, end);
+            }
+            _ => {
+                check_comment_ends_on_code_line(stats, start);
+                stats.ploc.lines.insert(start);
+            }
+        }
+    }
+}
+
+impl Loc for CsharpCode {
+    fn compute(node: &Node, stats: &mut Stats, is_func_space: bool, is_unit: bool) {
+        use Csharp::*;
+
+        let (start, end) = init(node, stats, is_func_space, is_unit);
+
+        match node.kind_id().into() {
+            CompilationUnit | Statement | Block | ExpressionStatement => {}
+            Comment => {
+                add_cloc_lines(stats, start, end);
+            }
+            _ => {
+                check_comment_ends_on_code_line(stats, start);
+                stats.ploc.lines.insert(start);
+            }
+        }
+    }
+}
+
 implement_metric_trait!(
     Loc,
     PreprocCode,
     CcommentCode,
     KotlinCode,
-    PerlCode,
-    HtmlCode,
-    PhpCode,
-    CsharpCode
+    PerlCode
 );
 
 #[cfg(test)]

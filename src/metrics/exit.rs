@@ -182,15 +182,37 @@ impl Exit for JavaCode {
     }
 }
 
+impl Exit for PhpCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use Php::*;
+        if matches!(
+            node.kind_id().into(),
+            ReturnStatement | ExitStatement | ThrowExpression
+        ) {
+            stats.exit += 1;
+        }
+    }
+}
+
+impl Exit for CsharpCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use Csharp::*;
+        if matches!(
+            node.kind_id().into(),
+            ReturnStatement | ThrowStatement | ThrowExpression
+        ) {
+            stats.exit += 1;
+        }
+    }
+}
+
 implement_metric_trait!(
     Exit,
     KotlinCode,
     PreprocCode,
     CcommentCode,
     PerlCode,
-    HtmlCode,
-    PhpCode,
-    CsharpCode
+    HtmlCode
 );
 
 #[cfg(test)]
