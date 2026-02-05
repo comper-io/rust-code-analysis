@@ -25,8 +25,8 @@ use rust_code_analysis::{
 
 // Functions
 use rust_code_analysis::{
-    action, fix_includes, get_from_ext, get_function_spaces, get_ops, guess_language, preprocess,
-    read_file, read_file_with_eol, write_file,
+    action, fix_includes, get_from_ext, get_function_spaces, get_ops, get_vue_metrics,
+    guess_language, preprocess, read_file, read_file_with_eol, write_file,
 };
 
 // Traits
@@ -74,10 +74,16 @@ fn act_on_file(path: PathBuf, cfg: &Config) -> std::io::Result<()> {
         return Ok(());
     };
 
+    // Check if this is a Vue file
+    let is_vue_file = path.extension().and_then(|e| e.to_str()) == Some("vue");
+
     let language = if let Some(language) = cfg.language {
         language
     } else if let Some(language) = guess_language(&source, &path).0 {
         language
+    } else if is_vue_file {
+        // For Vue files, we'll handle them specially below
+        LANG::Html // Placeholder, won't be used
     } else {
         return Ok(());
     };
@@ -91,7 +97,14 @@ fn act_on_file(path: PathBuf, cfg: &Config) -> std::io::Result<()> {
         action::<Dump>(&language, source, &path, pr, cfg)
     } else if cfg.metrics {
         if let Some(output_format) = &cfg.output_format {
-            if let Some(space) = get_function_spaces(&language, source, &path, pr) {
+            // Handle Vue files specially
+            let space = if is_vue_file {
+                get_vue_metrics(source, &path)
+            } else {
+                get_function_spaces(&language, source, &path, pr)
+            };
+
+            if let Some(space) = space {
                 output_format.dump_formats(space, path, cfg.output.as_ref(), cfg.pretty);
             }
             Ok(())

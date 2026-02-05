@@ -117,6 +117,7 @@ implement_metric_trait!(
     KotlinCode,
     PerlCode,
     HtmlCode,
+    CssCode,
     PhpCode,
     CsharpCode
 );

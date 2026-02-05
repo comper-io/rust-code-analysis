@@ -14,6 +14,9 @@ macro_rules! get_language {
     (tree_sitter_php) => {
         tree_sitter_php::LANGUAGE_PHP.into()
     };
+    (tree_sitter_css) => {
+        tree_sitter_css::LANGUAGE.into()
+    };
     ($name:ident) => {
         $name::LANGUAGE.into()
     };

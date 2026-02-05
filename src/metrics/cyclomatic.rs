@@ -234,6 +234,12 @@ impl Cyclomatic for HtmlCode {
     }
 }
 
+impl Cyclomatic for CssCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {
+        // CSS has no control flow
+    }
+}
+
 impl Cyclomatic for PhpCode {
     fn compute(node: &Node, stats: &mut Stats) {
         use Php::*;

@@ -207,6 +207,10 @@ impl Npm for HtmlCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }
 
+impl Npm for CssCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl Npm for PhpCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }

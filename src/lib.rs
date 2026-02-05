@@ -90,6 +90,9 @@ pub use crate::count::*;
 mod preproc;
 pub use crate::preproc::*;
 
+mod vue_extract;
+pub use crate::vue_extract::*;
+
 mod langs;
 pub use crate::langs::*;
 
@@ -107,3 +110,108 @@ pub use crate::parser::*;
 
 mod comment_rm;
 pub use crate::comment_rm::*;
+
+/// Compute metrics for a Vue Single File Component by analyzing all sections
+/// and combining the LoC metrics.
+pub fn get_vue_metrics(source: Vec<u8>, path: &std::path::Path) -> Option<FuncSpace> {
+    use std::path::PathBuf;
+
+    let sections = extract_vue_sections(&source);
+
+    // Create a combined metrics space
+    let mut combined_space = FuncSpace {
+        name: path.to_str().map(|s| s.to_string()),
+        start_line: 1,
+        end_line: source.iter().filter(|&&b| b == b'\n').count() + 1,
+        kind: SpaceKind::Unit,
+        spaces: Vec::new(),
+        metrics: CodeMetrics::default(),
+    };
+
+    // Analyze template section as HTML
+    if let Some(template_section) = sections.template {
+        if let Some(template_metrics) = get_function_spaces(
+            &LANG::Html,
+            template_section.content,
+            &PathBuf::from("template.html"),
+            None,
+        ) {
+            // Merge LoC metrics from template
+            combined_space
+                .metrics
+                .loc
+                .merge(&template_metrics.metrics.loc);
+        }
+    }
+
+    // Analyze script section as JavaScript or TypeScript
+    if let Some(script_section) = sections.script {
+        let script_lang = match script_section.lang.as_deref() {
+            Some("ts") | Some("typescript") => &LANG::Typescript,
+            _ => &LANG::Mozjs, // Default to JavaScript
+        };
+
+        if let Some(script_metrics) = get_function_spaces(
+            script_lang,
+            script_section.content,
+            &PathBuf::from("script.js"),
+            None,
+        ) {
+            // Merge all metrics from script (including complexity)
+            combined_space
+                .metrics
+                .loc
+                .merge(&script_metrics.metrics.loc);
+            combined_space
+                .metrics
+                .cyclomatic
+                .merge(&script_metrics.metrics.cyclomatic);
+            combined_space
+                .metrics
+                .cognitive
+                .merge(&script_metrics.metrics.cognitive);
+            combined_space
+                .metrics
+                .halstead
+                .merge(&script_metrics.metrics.halstead);
+            combined_space
+                .metrics
+                .nom
+                .merge(&script_metrics.metrics.nom);
+            combined_space.metrics.mi.merge(&script_metrics.metrics.mi);
+            combined_space
+                .metrics
+                .nargs
+                .merge(&script_metrics.metrics.nargs);
+            combined_space
+                .metrics
+                .nexits
+                .merge(&script_metrics.metrics.nexits);
+            combined_space
+                .metrics
+                .abc
+                .merge(&script_metrics.metrics.abc);
+
+            // Add script functions as subspaces
+            combined_space.spaces.extend(script_metrics.spaces);
+        }
+    }
+
+    // Analyze style section as CSS
+    if let Some(style_section) = sections.style {
+        // Only analyze plain CSS, skip SCSS/Less for now
+        if style_section.lang.is_none() || style_section.lang.as_deref() == Some("css") {
+            if let Some(style_metrics) = get_function_spaces(
+                &LANG::Css,
+                style_section.content,
+                &PathBuf::from("style.css"),
+                None,
+            ) {
+                // Merge LoC metrics from style
+                combined_space.metrics.loc.merge(&style_metrics.metrics.loc);
+            }
+        }
+    }
+
+    Some(combined_space)
+}

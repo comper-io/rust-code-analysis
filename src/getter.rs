@@ -589,6 +589,17 @@ impl Getter for HtmlCode {
     }
 }
 
+impl Getter for CssCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use Css::*;
+
+        match node.kind_id().into() {
+            Stylesheet => SpaceKind::Unit,
+            _ => SpaceKind::Unknown,
+        }
+    }
+}
+
 impl Getter for PhpCode {
     fn get_space_kind(node: &Node) -> SpaceKind {
         use Php::*;

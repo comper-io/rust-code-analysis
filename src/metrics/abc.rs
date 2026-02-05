@@ -364,6 +364,10 @@ impl Abc for HtmlCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }
 
+impl Abc for CssCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl Abc for PhpCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }

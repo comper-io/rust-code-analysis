@@ -16,6 +16,7 @@ mk_langs!(
     (Javascript, tree_sitter_javascript),
     (Perl, tree_sitter_perl),
     (Html, tree_sitter_html),
+    (Css, tree_sitter_css),
     (Php, tree_sitter_php),
     (Csharp, tree_sitter_c_sharp)
     // Note: Vue support temporarily disabled due to tree-sitter version incompatibility

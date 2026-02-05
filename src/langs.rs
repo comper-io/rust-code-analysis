@@ -148,6 +148,16 @@ mk_langs!(
         ["html", "html5"]
     ),
     (
+        Css,
+        "The `CSS` language",
+        "css",
+        CssCode,
+        CssParser,
+        tree_sitter_css,
+        [css],
+        ["css"]
+    ),
+    (
         Php,
         "The `PHP` language",
         "php",

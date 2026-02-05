@@ -153,6 +153,8 @@ impl Alterator for PerlCode {}
 
 impl Alterator for HtmlCode {}
 
+impl Alterator for CssCode {}
+
 impl Alterator for PhpCode {}
 
 impl Alterator for CsharpCode {}

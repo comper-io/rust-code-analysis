@@ -214,6 +214,10 @@ impl NArgs for HtmlCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }
 
+impl NArgs for CssCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl NArgs for CppCode {
     fn compute(node: &Node, stats: &mut Stats) {
         if Self::is_func(node) {

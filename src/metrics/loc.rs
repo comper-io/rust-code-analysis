@@ -880,6 +880,25 @@ impl Loc for HtmlCode {
     }
 }
 
+impl Loc for CssCode {
+    fn compute(node: &Node, stats: &mut Stats, is_func_space: bool, is_unit: bool) {
+        use Css::*;
+
+        let (start, end) = init(node, stats, is_func_space, is_unit);
+
+        match node.kind_id().into() {
+            Stylesheet | Block | Selectors => {}
+            Comment | JsComment => {
+                add_cloc_lines(stats, start, end);
+            }
+            _ => {
+                check_comment_ends_on_code_line(stats, start);
+                stats.ploc.lines.insert(start);
+            }
+        }
+    }
+}
+
 impl Loc for PhpCode {
     fn compute(node: &Node, stats: &mut Stats, is_func_space: bool, is_unit: bool) {
         use Php::*;

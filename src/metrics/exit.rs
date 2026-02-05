@@ -215,7 +215,14 @@ impl Exit for PerlCode {
     }
 }
 
-implement_metric_trait!(Exit, KotlinCode, PreprocCode, CcommentCode, HtmlCode);
+implement_metric_trait!(
+    Exit,
+    KotlinCode,
+    PreprocCode,
+    CcommentCode,
+    HtmlCode,
+    CssCode
+);
 
 #[cfg(test)]
 mod tests {

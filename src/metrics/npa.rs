@@ -207,6 +207,10 @@ impl Npa for HtmlCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }
 
+impl Npa for CssCode {
+    fn compute(_node: &Node, _stats: &mut Stats) {}
+}
+
 impl Npa for PhpCode {
     fn compute(_node: &Node, _stats: &mut Stats) {}
 }

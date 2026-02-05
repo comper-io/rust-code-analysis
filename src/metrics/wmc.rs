@@ -128,6 +128,10 @@ impl Wmc for HtmlCode {
     fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
 }
 
+impl Wmc for CssCode {
+    fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
+}
+
 impl Wmc for PhpCode {
     fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
 }

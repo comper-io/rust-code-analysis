@@ -511,6 +511,16 @@ impl Cognitive for HtmlCode {
     }
 }
 
+impl Cognitive for CssCode {
+    fn compute(
+        _node: &Node,
+        _stats: &mut Stats,
+        _nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        // CSS has no control flow
+    }
+}
+
 impl Cognitive for PhpCode {
     fn compute(
         node: &Node,

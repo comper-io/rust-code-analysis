@@ -750,6 +750,51 @@ impl Checker for HtmlCode {
     }
 }
 
+impl Checker for CssCode {
+    fn is_comment(node: &Node) -> bool {
+        use Css::*;
+        matches!(node.kind_id().into(), Comment | JsComment)
+    }
+
+    fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
+        false
+    }
+
+    fn is_func_space(node: &Node) -> bool {
+        use Css::*;
+        node.kind_id() == Stylesheet
+    }
+
+    fn is_func(_: &Node) -> bool {
+        false
+    }
+
+    fn is_closure(_: &Node) -> bool {
+        false
+    }
+
+    fn is_call(_: &Node) -> bool {
+        false
+    }
+
+    fn is_non_arg(_: &Node) -> bool {
+        false
+    }
+
+    fn is_string(node: &Node) -> bool {
+        use Css::*;
+        node.kind_id() == StringValue
+    }
+
+    fn is_else_if(_: &Node) -> bool {
+        false
+    }
+
+    fn is_primitive(_id: u16) -> bool {
+        false
+    }
+}
+
 impl Checker for PhpCode {
     fn is_comment(node: &Node) -> bool {
         node.kind_id() == Php::Comment

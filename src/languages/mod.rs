@@ -39,6 +39,9 @@ pub use language_perl::*;
 pub mod language_html;
 pub use language_html::*;
 
+pub mod language_css;
+pub use language_css::*;
+
 pub mod language_php;
 pub use language_php::*;
 
