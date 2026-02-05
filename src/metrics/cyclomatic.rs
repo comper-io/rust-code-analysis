@@ -239,7 +239,16 @@ impl Cyclomatic for PhpCode {
         use Php::*;
 
         match node.kind_id().into() {
-            If | For | Foreach | While | Do | Case | Catch | ConditionalExpression | AMPAMP | PIPEPIPE => {
+            If
+            | For
+            | Foreach
+            | While
+            | Do
+            | Case
+            | Catch
+            | ConditionalExpression
+            | AMPAMP
+            | PIPEPIPE => {
                 stats.cyclomatic += 1.;
             }
             _ => {}
@@ -252,7 +261,17 @@ impl Cyclomatic for CsharpCode {
         use Csharp::*;
 
         match node.kind_id().into() {
-            If | For | Foreach | While | Do | Case | Catch | ConditionalExpression | AMPAMP | PIPEPIPE | QMARKQMARK => {
+            If
+            | For
+            | Foreach
+            | While
+            | Do
+            | Case
+            | Catch
+            | ConditionalExpression
+            | AMPAMP
+            | PIPEPIPE
+            | QMARKQMARK => {
                 stats.cyclomatic += 1.;
             }
             _ => {}
@@ -281,12 +300,7 @@ impl Cyclomatic for PerlCode {
     }
 }
 
-implement_metric_trait!(
-    Cyclomatic,
-    KotlinCode,
-    PreprocCode,
-    CcommentCode
-);
+implement_metric_trait!(Cyclomatic, KotlinCode, PreprocCode, CcommentCode);
 
 #[cfg(test)]
 mod tests {

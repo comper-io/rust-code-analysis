@@ -437,7 +437,6 @@ pub enum Php {
     NowdocBodyRepeat1 = 430,
     Operation = 431,
     Error = 432,
-    
 }
 
 impl From<Php> for &'static str {
@@ -877,7 +876,6 @@ impl From<Php> for &'static str {
             Php::NowdocBodyRepeat1 => "nowdoc_body_repeat1",
             Php::Operation => "operation",
             Php::Error => "ERROR",
-            
         }
     }
 }

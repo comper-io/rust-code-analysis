@@ -522,8 +522,14 @@ impl Cognitive for PhpCode {
         let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
-            IfStatement | ForStatement | ForeachStatement | WhileStatement | DoStatement
-            | SwitchStatement | CatchClause | ConditionalExpression => {
+            IfStatement
+            | ForStatement
+            | ForeachStatement
+            | WhileStatement
+            | DoStatement
+            | SwitchStatement
+            | CatchClause
+            | ConditionalExpression => {
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             ElseIfClause | ElseIfClause2 | ElseClause | ElseClause2 | FinallyClause => {
@@ -556,8 +562,14 @@ impl Cognitive for CsharpCode {
         let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
-            IfStatement | ForStatement | ForeachStatement | WhileStatement | DoStatement
-            | SwitchStatement | CatchClause | ConditionalExpression => {
+            IfStatement
+            | ForStatement
+            | ForeachStatement
+            | WhileStatement
+            | DoStatement
+            | SwitchStatement
+            | CatchClause
+            | ConditionalExpression => {
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             Else | FinallyClause => {
@@ -603,7 +615,8 @@ impl Cognitive for PerlCode {
             LoopStatement | CstyleForStatement | ForStatement => {
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
-            ConditionalExpression => { // Ternary
+            ConditionalExpression => {
+                // Ternary
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             BinaryExpression => {
@@ -611,14 +624,21 @@ impl Cognitive for PerlCode {
                 // We can use a custom logic here since compute_booleans is limited
                 for child in node.children() {
                     let kind = child.kind_id();
-                    if kind == AMPAMP as u16 || kind == PIPEPIPE as u16 || kind == 102 /* and */ || kind == 103 /* or */ {
-                         stats.structural = stats.boolean_seq.eval_based_on_prev(kind, stats.structural);
+                    if kind == AMPAMP as u16 || kind == PIPEPIPE as u16 || kind == 102 /* and */ || kind == 103
+                    /* or */
+                    {
+                        stats.structural =
+                            stats.boolean_seq.eval_based_on_prev(kind, stats.structural);
                     }
                 }
             }
             SubroutineDeclarationStatement | MethodDeclarationStatement => {
                 nesting = 0;
-                increment_function_depth::<u16>(&mut depth, node, SubroutineDeclarationStatement as u16);
+                increment_function_depth::<u16>(
+                    &mut depth,
+                    node,
+                    SubroutineDeclarationStatement as u16,
+                );
             }
             AnonymousSubroutineExpression => {
                 lambda += 1;
@@ -629,12 +649,7 @@ impl Cognitive for PerlCode {
     }
 }
 
-implement_metric_trait!(
-    Cognitive,
-    PreprocCode,
-    CcommentCode,
-    KotlinCode
-);
+implement_metric_trait!(Cognitive, PreprocCode, CcommentCode, KotlinCode);
 
 #[cfg(test)]
 mod tests {

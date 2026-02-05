@@ -508,7 +508,6 @@ pub enum Csharp {
     ImplicitParameter = 501,
     InterpolationQuote = 502,
     Error = 503,
-    
 }
 
 impl From<Csharp> for &'static str {
@@ -980,7 +979,9 @@ impl From<Csharp> for &'static str {
             Csharp::RecordBaseRepeat1 => "record_base_repeat1",
             Csharp::TypeParameterListRepeat1 => "type_parameter_list_repeat1",
             Csharp::BaseListRepeat1 => "base_list_repeat1",
-            Csharp::TypeParameterConstraintsClauseRepeat1 => "type_parameter_constraints_clause_repeat1",
+            Csharp::TypeParameterConstraintsClauseRepeat1 => {
+                "type_parameter_constraints_clause_repeat1"
+            }
             Csharp::DeclarationListRepeat1 => "declaration_list_repeat1",
             Csharp::AccessorListRepeat1 => "accessor_list_repeat1",
             Csharp::BracketedParameterListRepeat1 => "bracketed_parameter_list_repeat1",
@@ -1001,7 +1002,9 @@ impl From<Csharp> for &'static str {
             Csharp::TryStatementRepeat1 => "try_statement_repeat1",
             Csharp::ListPatternRepeat1 => "list_pattern_repeat1",
             Csharp::PositionalPatternClauseRepeat1 => "positional_pattern_clause_repeat1",
-            Csharp::ParenthesizedVariableDesignationRepeat1 => "parenthesized_variable_designation_repeat1",
+            Csharp::ParenthesizedVariableDesignationRepeat1 => {
+                "parenthesized_variable_designation_repeat1"
+            }
             Csharp::QueryBodyRepeat1 => "_query_body_repeat1",
             Csharp::QueryBodyRepeat2 => "_query_body_repeat2",
             Csharp::OrderByClauseRepeat1 => "order_by_clause_repeat1",
@@ -1010,7 +1013,9 @@ impl From<Csharp> for &'static str {
             Csharp::InterpolatedStringExpressionRepeat2 => "interpolated_string_expression_repeat2",
             Csharp::InterpolatedStringExpressionRepeat3 => "interpolated_string_expression_repeat3",
             Csharp::LambdaExpressionRepeat1 => "lambda_expression_repeat1",
-            Csharp::AnonymousObjectCreationExpressionRepeat1 => "anonymous_object_creation_expression_repeat1",
+            Csharp::AnonymousObjectCreationExpressionRepeat1 => {
+                "anonymous_object_creation_expression_repeat1"
+            }
             Csharp::WithExpressionRepeat1 => "with_expression_repeat1",
             Csharp::StringLiteralRepeat1 => "string_literal_repeat1",
             Csharp::PreprocIfInTopLevelRepeat1 => "preproc_if_in_top_level_repeat1",
@@ -1019,7 +1024,6 @@ impl From<Csharp> for &'static str {
             Csharp::ImplicitParameter => "implicit_parameter",
             Csharp::InterpolationQuote => "interpolation_quote",
             Csharp::Error => "ERROR",
-            
         }
     }
 }

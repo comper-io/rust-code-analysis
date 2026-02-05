@@ -715,7 +715,10 @@ impl Checker for HtmlCode {
 
     fn is_func_space(node: &Node) -> bool {
         use Html::*;
-        matches!(node.kind_id().into(), Document | ScriptElement | StyleElement)
+        matches!(
+            node.kind_id().into(),
+            Document | ScriptElement | StyleElement
+        )
     }
 
     fn is_func(_: &Node) -> bool {
@@ -799,7 +802,10 @@ impl Checker for PhpCode {
 
     fn is_string(node: &Node) -> bool {
         use Php::*;
-        matches!(node.kind_id().into(), String | EncapsedString | Heredoc | Nowdoc)
+        matches!(
+            node.kind_id().into(),
+            String | EncapsedString | Heredoc | Nowdoc
+        )
     }
 
     fn is_else_if(node: &Node) -> bool {
@@ -913,7 +919,10 @@ impl Checker for PerlCode {
         use crate::languages::Perl::*;
         matches!(
             node.kind_id().into(),
-            SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement | PackageStatement
+            SourceFile
+                | SubroutineDeclarationStatement
+                | MethodDeclarationStatement
+                | PackageStatement
         )
     }
 
@@ -938,11 +947,21 @@ impl Checker for PerlCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-use crate::languages::Perl::*;
-                matches!(
-                    node.kind_id().into(),
-                    LPAREN | RPAREN | COMMA | SEMI | LBRACE | RBRACE | Signature | Prototype | ExpressionStatement | AssignmentExpression | VariableDeclaration
-                )
+        use crate::languages::Perl::*;
+        matches!(
+            node.kind_id().into(),
+            LPAREN
+                | RPAREN
+                | COMMA
+                | SEMI
+                | LBRACE
+                | RBRACE
+                | Signature
+                | Prototype
+                | ExpressionStatement
+                | AssignmentExpression
+                | VariableDeclaration
+        )
     }
 
     fn is_string(node: &Node) -> bool {

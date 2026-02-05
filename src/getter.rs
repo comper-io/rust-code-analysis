@@ -613,18 +613,18 @@ impl Getter for PhpCode {
             | PLUSPLUS | STARSTAREQ | STAREQ | SLASHEQ | PERCENTEQ | PLUSEQ | DASHEQ | DOTEQ
             | LTLTEQ | GTGTEQ | AMPEQ | CARETEQ | PIPEEQ | QMARKQMARKEQ | DASHGT | QMARKDASHGT
             | EscapeSequence | EscapeSequence2 | DOLLAR | Yield | Yieldfrom | Instanceof
-            | QMARKQMARK | STARSTAR | And | Or | Xor | PIPEPIPE | AMPAMP | CARET | EQEQ | BANGEQ
-            | LTGT | EQEQEQ | BANGEQEQ | LT | GT | LTEQ | GTEQ | LTEQGT | PIPEGT | DOT | LTLT
-            | GTGT | STAR | SLASH | PERCENT | Include | IncludeOnce | Require | RequireOnce
-            | Echo | Exit | Unset | Declare | Enddeclare | Ticks | Encoding | StrictTypes
-            | Try | Catch | Finally | Goto | Continue | Break | Return | Throw | While
-            | Endwhile | Do | For | Endfor | Foreach | Endforeach | If | Endif | Elseif | Else
-            | Match | Default | Switch | Endswitch | EQ | COMMA | SEMI | COLON | QMARK
+            | QMARKQMARK | STARSTAR | And | Or | Xor | PIPEPIPE | AMPAMP | CARET | EQEQ
+            | BANGEQ | LTGT | EQEQEQ | BANGEQEQ | LT | GT | LTEQ | GTEQ | LTEQGT | PIPEGT | DOT
+            | LTLT | GTGT | STAR | SLASH | PERCENT | Include | IncludeOnce | Require
+            | RequireOnce | Echo | Exit | Unset | Declare | Enddeclare | Ticks | Encoding
+            | StrictTypes | Try | Catch | Finally | Goto | Continue | Break | Return | Throw
+            | While | Endwhile | Do | For | Endfor | Foreach | Endforeach | If | Endif | Elseif
+            | Else | Match | Default | Switch | Endswitch | EQ | COMMA | SEMI | COLON | QMARK
             | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE => HalsteadType::Operator,
 
             VariableName | DynamicVariableName | Name | QualifiedName | RelativeName | Name2
-            | String | Int | Float | Bool | Null | Null2 | Integer | Float2 | Boolean
-            | String2 | EncapsedString | Nowdoc | Heredoc => HalsteadType::Operand,
+            | String | Int | Float | Bool | Null | Null2 | Integer | Float2 | Boolean | String2
+            | EncapsedString | Nowdoc | Heredoc => HalsteadType::Operand,
 
             _ => HalsteadType::Unknown,
         }
@@ -639,9 +639,14 @@ impl Getter for CsharpCode {
 
         match node.kind_id().into() {
             CompilationUnit => SpaceKind::Unit,
-            MethodDeclaration | ConstructorDeclaration | DestructorDeclaration
-            | OperatorDeclaration | ConversionOperatorDeclaration | LocalFunctionStatement
-            | LambdaExpression | AnonymousMethodExpression => SpaceKind::Function,
+            MethodDeclaration
+            | ConstructorDeclaration
+            | DestructorDeclaration
+            | OperatorDeclaration
+            | ConversionOperatorDeclaration
+            | LocalFunctionStatement
+            | LambdaExpression
+            | AnonymousMethodExpression => SpaceKind::Function,
             ClassDeclaration | RecordDeclaration => SpaceKind::Class,
             StructDeclaration => SpaceKind::Struct,
             EnumDeclaration => SpaceKind::Unit,
@@ -656,19 +661,17 @@ impl Getter for CsharpCode {
         match node.kind_id().into() {
             EQ | LT | GT | QMARK | BANG | TILDE | PLUSPLUS | DASHDASH | PLUS | DASH | STAR
             | SLASH | PERCENT | CARET | PIPE | AMP | LTLT | GTGT | GTGTGT | EQEQ | BANGEQ
-            | GTEQ | LTEQ | Is | As | New | Sizeof | Typeof | Checked | Unchecked | Await
-            | If | Else | Switch | Case | Default | Do | While | For | Foreach | Return
-            | Break | Continue | Goto | Throw | Try | Catch | Finally | Lock | Yield
-            | Using | Fixed | DOT | DASHGT | COLONCOLON | QMARKQMARK | And | Or | Not
-            | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | CARETEQ | PIPEEQ
-            | LTLTEQ | GTGTEQ | GTGTGTEQ | QMARKQMARKEQ | AMPAMP | PIPEPIPE
-            | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE | SEMI | COMMA | COLON
-            => HalsteadType::Operator,
+            | GTEQ | LTEQ | Is | As | New | Sizeof | Typeof | Checked | Unchecked | Await | If
+            | Else | Switch | Case | Default | Do | While | For | Foreach | Return | Break
+            | Continue | Goto | Throw | Try | Catch | Finally | Lock | Yield | Using | Fixed
+            | DOT | DASHGT | COLONCOLON | QMARKQMARK | And | Or | Not | PLUSEQ | DASHEQ
+            | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | CARETEQ | PIPEEQ | LTLTEQ | GTGTEQ
+            | GTGTGTEQ | QMARKQMARKEQ | AMPAMP | PIPEPIPE | LPAREN | RPAREN | LBRACK | RBRACK
+            | LBRACE | RBRACE | SEMI | COMMA | COLON => HalsteadType::Operator,
 
-            Identifier | SimpleName | QualifiedName | GenericName
-            | Literal | IntegerLiteral | RealLiteral | StringLiteral | CharacterLiteral
-            | BooleanLiteral | NullLiteral | True | False | This | Base
-             => HalsteadType::Operand,
+            Identifier | SimpleName | QualifiedName | GenericName | Literal | IntegerLiteral
+            | RealLiteral | StringLiteral | CharacterLiteral | BooleanLiteral | NullLiteral
+            | True | False | This | Base => HalsteadType::Operand,
 
             _ => HalsteadType::Unknown,
         }
@@ -696,17 +699,17 @@ impl Getter for PerlCode {
         match node.kind_id().into() {
             // Operators
             PLUS | DASH | STAR | SLASH | PERCENT | EQ | EQEQ | BANGEQ | LT | GT | LTEQ | GTEQ
-            | AMPAMP | PIPEPIPE | BANG | DOT | DOTDOT | DOTDOTDOT | COLON | QMARK | SEMI | COMMA
-            | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE | DASHGT | PLUSPLUS | DASHDASH
-            | STARSTAR | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | PIPEEQ
-            | CARETEQ | LTLT | GTGT | TILDE | And | Or | Xor | Eq | Ne | Lt | Gt | Le | Ge
-            | Cmp | Isa | STARSTAREQ | DOTEQ | XEQ | LTLTEQ | GTGTEQ | AMPAMPEQ | PIPEPIPEEQ
-            | SLASHSLASHEQ => HalsteadType::Operator,
+            | AMPAMP | PIPEPIPE | BANG | DOT | DOTDOT | DOTDOTDOT | COLON | QMARK | SEMI
+            | COMMA | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE | DASHGT | PLUSPLUS
+            | DASHDASH | STARSTAR | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ
+            | PIPEEQ | CARETEQ | LTLT | GTGT | TILDE | And | Or | Xor | Eq | Ne | Lt | Gt | Le
+            | Ge | Cmp | Isa | STARSTAREQ | DOTEQ | XEQ | LTLTEQ | GTGTEQ | AMPAMPEQ
+            | PIPEPIPEEQ | SLASHSLASHEQ => HalsteadType::Operator,
 
             // Keywords
-            If | Else | While | Until | For | Foreach | Return | My | Sub | Package | Use | Require
-            | Last | Next | Redo | Goto | Map | Grep | Sort | Eval | Unless | Elsif | Do | Continue
-            | Our | Local | State => HalsteadType::Operator,
+            If | Else | While | Until | For | Foreach | Return | My | Sub | Package | Use
+            | Require | Last | Next | Redo | Goto | Map | Grep | Sort | Eval | Unless | Elsif
+            | Do | Continue | Our | Local | State => HalsteadType::Operator,
 
             // Functions acting as operators
             Exit => HalsteadType::Operator,
@@ -717,8 +720,14 @@ impl Getter for PerlCode {
             }
 
             // Operands
-            Scalar | Array | Hash | Number | StringLiteral | InterpolatedStringLiteral
-            | Bareword | Varname => HalsteadType::Operand,
+            Scalar
+            | Array
+            | Hash
+            | Number
+            | StringLiteral
+            | InterpolatedStringLiteral
+            | Bareword
+            | Varname => HalsteadType::Operand,
 
             _ => HalsteadType::Unknown,
         }

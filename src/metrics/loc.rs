@@ -918,13 +918,7 @@ impl Loc for CsharpCode {
     }
 }
 
-implement_metric_trait!(
-    Loc,
-    PreprocCode,
-    CcommentCode,
-    KotlinCode,
-    PerlCode
-);
+implement_metric_trait!(Loc, PreprocCode, CcommentCode, KotlinCode, PerlCode);
 
 #[cfg(test)]
 mod tests {

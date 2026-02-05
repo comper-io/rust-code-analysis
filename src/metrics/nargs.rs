@@ -253,38 +253,40 @@ impl NArgs for PerlCode {
                     }
                 }
             } else if let Some(block) = block_node {
-                 block.act_on_child(&mut |n| {
-                     if n.kind_id() == crate::languages::Perl::ExpressionStatement {
-                         for assign in n.children() {
-                             if assign.kind_id() == crate::languages::Perl::AssignmentExpression {
-                                 let mut left_node = None;
-                                 let mut right_node = None;
-                                 for child in assign.children() {
-                                     if child.kind_id() == crate::languages::Perl::Array {
-                                         right_node = Some(child);
-                                     } else if child.kind_id() == crate::languages::Perl::VariableDeclaration {
-                                         left_node = Some(child);
-                                     }
-                                 }
+                block.act_on_child(&mut |n| {
+                    if n.kind_id() == crate::languages::Perl::ExpressionStatement {
+                        for assign in n.children() {
+                            if assign.kind_id() == crate::languages::Perl::AssignmentExpression {
+                                let mut left_node = None;
+                                let mut right_node = None;
+                                for child in assign.children() {
+                                    if child.kind_id() == crate::languages::Perl::Array {
+                                        right_node = Some(child);
+                                    } else if child.kind_id()
+                                        == crate::languages::Perl::VariableDeclaration
+                                    {
+                                        left_node = Some(child);
+                                    }
+                                }
 
-                                 if let Some(right) = right_node {
-                                      let start = right.start_byte();
-                                      let end = right.end_byte();
-                                      // Check for @_
-                                      if end >= start + 2 {
-                                          if let Some(left) = left_node {
-                                               left.act_on_child(&mut |v| {
-                                                    if v.kind_id() == crate::languages::Perl::Scalar {
-                                                        stats.fn_nargs += 1;
-                                                    }
-                                               });
-                                          }
-                                      }
-                                 }
-                             }
-                         }
-                     }
-                 });
+                                if let Some(right) = right_node {
+                                    let start = right.start_byte();
+                                    let end = right.end_byte();
+                                    // Check for @_
+                                    if end >= start + 2 {
+                                        if let Some(left) = left_node {
+                                            left.act_on_child(&mut |v| {
+                                                if v.kind_id() == crate::languages::Perl::Scalar {
+                                                    stats.fn_nargs += 1;
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
             return;
         }
