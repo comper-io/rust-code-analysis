@@ -233,6 +233,76 @@ impl NArgs for CppCode {
     }
 }
 
+impl NArgs for PerlCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        if Self::is_func(node) {
+            let mut signature_node = None;
+            let mut block_node = None;
+            for child in node.children() {
+                if child.kind_id() == crate::languages::Perl::Signature {
+                    signature_node = Some(child);
+                } else if child.kind_id() == crate::languages::Perl::Block {
+                    block_node = Some(child);
+                }
+            }
+
+            if let Some(signature) = signature_node {
+                for child in signature.children() {
+                    if !Self::is_non_arg(&child) {
+                        stats.fn_nargs += 1;
+                    }
+                }
+            } else if let Some(block) = block_node {
+                 block.act_on_child(&mut |n| {
+                     if n.kind_id() == crate::languages::Perl::ExpressionStatement {
+                         for assign in n.children() {
+                             if assign.kind_id() == crate::languages::Perl::AssignmentExpression {
+                                 let mut left_node = None;
+                                 let mut right_node = None;
+                                 for child in assign.children() {
+                                     if child.kind_id() == crate::languages::Perl::Array {
+                                         right_node = Some(child);
+                                     } else if child.kind_id() == crate::languages::Perl::VariableDeclaration {
+                                         left_node = Some(child);
+                                     }
+                                 }
+
+                                 if let Some(right) = right_node {
+                                      let start = right.start_byte();
+                                      let end = right.end_byte();
+                                      // Check for @_
+                                      if end >= start + 2 {
+                                          if let Some(left) = left_node {
+                                               left.act_on_child(&mut |v| {
+                                                    if v.kind_id() == crate::languages::Perl::Scalar {
+                                                        stats.fn_nargs += 1;
+                                                    }
+                                               });
+                                          }
+                                      }
+                                 }
+                             }
+                         }
+                     }
+                 });
+            }
+            return;
+        }
+
+        if Self::is_closure(node) {
+            for child in node.children() {
+                if child.kind_id() == crate::languages::Perl::Signature {
+                    for param in child.children() {
+                        if !Self::is_non_arg(&param) {
+                            stats.closure_nargs += 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 implement_metric_trait!(
     [NArgs],
     PythonCode,
@@ -245,7 +315,6 @@ implement_metric_trait!(
     CcommentCode,
     JavaCode,
     KotlinCode,
-    PerlCode,
     PhpCode,
     CsharpCode
 );

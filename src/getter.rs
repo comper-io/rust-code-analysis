@@ -685,7 +685,44 @@ impl Getter for PerlCode {
             SourceFile => SpaceKind::Unit,
             SubroutineDeclarationStatement | MethodDeclarationStatement => SpaceKind::Function,
             ClassStatement => SpaceKind::Class,
+            PackageStatement => SpaceKind::Namespace,
             _ => SpaceKind::Unknown,
         }
     }
+
+    fn get_op_type(node: &Node) -> HalsteadType {
+        use crate::languages::Perl::*;
+
+        match node.kind_id().into() {
+            // Operators
+            PLUS | DASH | STAR | SLASH | PERCENT | EQ | EQEQ | BANGEQ | LT | GT | LTEQ | GTEQ
+            | AMPAMP | PIPEPIPE | BANG | DOT | DOTDOT | DOTDOTDOT | COLON | QMARK | SEMI | COMMA
+            | LPAREN | RPAREN | LBRACK | RBRACK | LBRACE | RBRACE | DASHGT | PLUSPLUS | DASHDASH
+            | STARSTAR | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | PIPEEQ
+            | CARETEQ | LTLT | GTGT | TILDE | And | Or | Xor | Eq | Ne | Lt | Gt | Le | Ge
+            | Cmp | Isa | STARSTAREQ | DOTEQ | XEQ | LTLTEQ | GTGTEQ | AMPAMPEQ | PIPEPIPEEQ
+            | SLASHSLASHEQ => HalsteadType::Operator,
+
+            // Keywords
+            If | Else | While | Until | For | Foreach | Return | My | Sub | Package | Use | Require
+            | Last | Next | Redo | Goto | Map | Grep | Sort | Eval | Unless | Elsif | Do | Continue
+            | Our | Local | State => HalsteadType::Operator,
+
+            // Functions acting as operators
+            Exit => HalsteadType::Operator,
+
+            // Call Expressions - treated as operators
+            FunctionCallExpression | MethodCallExpression | AmbiguousFunctionCallExpression => {
+                HalsteadType::Operator
+            }
+
+            // Operands
+            Scalar | Array | Hash | Number | StringLiteral | InterpolatedStringLiteral
+            | Bareword | Varname => HalsteadType::Operand,
+
+            _ => HalsteadType::Unknown,
+        }
+    }
+
+    get_operator!(Perl);
 }

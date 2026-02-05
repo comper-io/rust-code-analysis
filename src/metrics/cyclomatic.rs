@@ -260,12 +260,32 @@ impl Cyclomatic for CsharpCode {
     }
 }
 
+impl Cyclomatic for PerlCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use crate::languages::Perl::*;
+
+        match node.kind_id().into() {
+            If | Unless | Elsif | While | Until | For | Foreach | AMPAMP | PIPEPIPE => {
+                stats.cyclomatic += 1.;
+            }
+            ConditionalExpression => {
+                stats.cyclomatic += 1.;
+            }
+            _ => {
+                let kind = node.kind();
+                if kind == "and" || kind == "or" || kind == "xor" {
+                    stats.cyclomatic += 1.;
+                }
+            }
+        }
+    }
+}
+
 implement_metric_trait!(
     Cyclomatic,
     KotlinCode,
     PreprocCode,
-    CcommentCode,
-    PerlCode
+    CcommentCode
 );
 
 #[cfg(test)]

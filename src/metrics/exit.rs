@@ -206,12 +206,20 @@ impl Exit for CsharpCode {
     }
 }
 
+impl Exit for PerlCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use crate::languages::Perl::*;
+        if matches!(node.kind_id().into(), Return | Exit) {
+            stats.exit += 1;
+        }
+    }
+}
+
 implement_metric_trait!(
     Exit,
     KotlinCode,
     PreprocCode,
     CcommentCode,
-    PerlCode,
     HtmlCode
 );
 

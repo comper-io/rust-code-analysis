@@ -353,8 +353,7 @@ implement_metric_trait!(
     CppCode,
     PreprocCode,
     CcommentCode,
-    KotlinCode,
-    PerlCode
+    KotlinCode
 );
 
 // Fitzpatrick, Jerry (1997). "Applying the ABC metric to C, C++ and Java". C++ Report.
@@ -559,6 +558,52 @@ impl Abc for JavaCode {
     }
 }
 
+impl Abc for PerlCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        use crate::languages::Perl::*;
+
+        match node.kind_id().into() {
+            // Assignments
+            EQ | PLUSEQ | DASHEQ | STAREQ | SLASHEQ | PERCENTEQ | AMPEQ | PIPEEQ | CARETEQ
+            | STARSTAREQ | DOTEQ | XEQ | LTLTEQ | GTGTEQ | AMPAMPEQ | PIPEPIPEEQ | SLASHSLASHEQ
+            | PLUSPLUS | DASHDASH => {
+                stats.assignments += 1.;
+            }
+            // Branches
+            FunctionCallExpression
+            | MethodCallExpression
+            | AmbiguousFunctionCallExpression
+            | CoderefCallExpression
+            | Func0opCallExpression
+            | Func1opCallExpression
+            | MapGrepExpression
+            | SortExpression
+            | EvalExpression
+            | DoExpression
+            | Goto
+            | Last
+            | Next
+            | Redo => {
+                stats.branches += 1.;
+            }
+            // Conditions
+            If | Elsif | Unless | While | Until | For | Foreach | QMARK | Try | Catch => {
+                stats.conditions += 1.;
+            }
+            // Boolean operators
+            AMPAMP | PIPEPIPE | And | Or | Xor => {
+                stats.conditions += 1.;
+            }
+            // Relational operators
+            EQEQ | BANGEQ | LT | GT | LTEQ | GTEQ | Eq | Ne | Lt | Gt | Le | Ge | Cmp | Isa
+            | TILDETILDE => {
+                stats.conditions += 1.;
+            }
+            _ => {}
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::tools::check_metrics;
@@ -637,7 +682,7 @@ mod tests {
             List<String> n = null;          // +1a (< and > used for generic types are not counted as conditions)
             ",
             "foo.java",
-          |metric| {
+            |metric| {
                 // magnitude: sqrt(196 + 9 + 144) = sqrt(349)
                 // space count: 1 (1 unit)
                 insta::assert_json_snapshot!(

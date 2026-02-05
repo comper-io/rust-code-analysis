@@ -901,8 +901,8 @@ impl Checker for CsharpCode {
 }
 
 impl Checker for PerlCode {
-    fn is_comment(_: &Node) -> bool {
-        false
+    fn is_comment(node: &Node) -> bool {
+        node.kind_id() == Perl::Comment
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
@@ -913,32 +913,48 @@ impl Checker for PerlCode {
         use crate::languages::Perl::*;
         matches!(
             node.kind_id().into(),
-            SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement
+            SourceFile | SubroutineDeclarationStatement | MethodDeclarationStatement | PackageStatement
         )
     }
 
-    fn is_func(_: &Node) -> bool {
-        false
+    fn is_func(node: &Node) -> bool {
+        use crate::languages::Perl::*;
+        matches!(
+            node.kind_id().into(),
+            SubroutineDeclarationStatement | MethodDeclarationStatement
+        )
     }
 
-    fn is_closure(_: &Node) -> bool {
-        false
+    fn is_closure(node: &Node) -> bool {
+        node.kind_id() == Perl::AnonymousSubroutineExpression
     }
 
-    fn is_call(_: &Node) -> bool {
-        false
+    fn is_call(node: &Node) -> bool {
+        use crate::languages::Perl::*;
+        matches!(
+            node.kind_id().into(),
+            FunctionCallExpression | MethodCallExpression | AmbiguousFunctionCallExpression
+        )
     }
 
-    fn is_non_arg(_: &Node) -> bool {
-        false
+    fn is_non_arg(node: &Node) -> bool {
+use crate::languages::Perl::*;
+                matches!(
+                    node.kind_id().into(),
+                    LPAREN | RPAREN | COMMA | SEMI | LBRACE | RBRACE | Signature | Prototype | ExpressionStatement | AssignmentExpression | VariableDeclaration
+                )
     }
 
-    fn is_string(_: &Node) -> bool {
-        false
+    fn is_string(node: &Node) -> bool {
+        use crate::languages::Perl::*;
+        matches!(
+            node.kind_id().into(),
+            StringLiteral | InterpolatedStringLiteral
+        )
     }
 
-    fn is_else_if(_: &Node) -> bool {
-        false
+    fn is_else_if(node: &Node) -> bool {
+        node.kind_id() == Perl::Elsif
     }
 
     fn is_primitive(_id: u16) -> bool {

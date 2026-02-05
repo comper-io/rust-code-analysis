@@ -579,12 +579,61 @@ impl Cognitive for CsharpCode {
     }
 }
 
+impl Cognitive for PerlCode {
+    fn compute(
+        node: &Node,
+        stats: &mut Stats,
+        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        use crate::languages::Perl::*;
+
+        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+
+        match node.kind_id().into() {
+            ConditionalStatement => {
+                // Check if it's if or unless
+                // If it has 'if' or 'unless' child?
+                // Actually, ConditionalStatement covers if/unless.
+                // We increase nesting for the statement itself.
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            Elsif | Else => {
+                increment_by_one(stats);
+            }
+            LoopStatement | CstyleForStatement | ForStatement => {
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            ConditionalExpression => { // Ternary
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            BinaryExpression => {
+                // Check for &&, ||, and, or
+                // We can use a custom logic here since compute_booleans is limited
+                for child in node.children() {
+                    let kind = child.kind_id();
+                    if kind == AMPAMP as u16 || kind == PIPEPIPE as u16 || kind == 102 /* and */ || kind == 103 /* or */ {
+                         stats.structural = stats.boolean_seq.eval_based_on_prev(kind, stats.structural);
+                    }
+                }
+            }
+            SubroutineDeclarationStatement | MethodDeclarationStatement => {
+                nesting = 0;
+                increment_function_depth::<u16>(&mut depth, node, SubroutineDeclarationStatement as u16);
+            }
+            AnonymousSubroutineExpression => {
+                lambda += 1;
+            }
+            _ => {}
+        }
+        nesting_map.insert(node.id(), (nesting, depth, lambda));
+    }
+}
+
 implement_metric_trait!(
     Cognitive,
     PreprocCode,
     CcommentCode,
-    KotlinCode,
-    PerlCode
+    KotlinCode
 );
 
 #[cfg(test)]

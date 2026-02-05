@@ -340,12 +340,17 @@ impl Halstead for CsharpCode {
     }
 }
 
+impl Halstead for PerlCode {
+    fn compute<'a>(node: &Node<'a>, code: &'a [u8], halstead_maps: &mut HalsteadMaps<'a>) {
+        compute_halstead::<Self>(node, code, halstead_maps);
+    }
+}
+
 implement_metric_trait!(
     Halstead,
     KotlinCode,
     PreprocCode,
     CcommentCode,
-    PerlCode,
     HtmlCode
 );
 
