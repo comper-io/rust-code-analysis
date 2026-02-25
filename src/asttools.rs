@@ -31,6 +31,42 @@ pub fn get_parent<'a>(node: &Node<'a>, level: usize) -> Option<Node<'a>> {
     Some(current)
 }
 
+/// Traverses a tree passing from children to children in search of a specific
+/// token or series of tokens.
+///
+/// # Arguments
+/// * `node` - The starting node
+/// * `token_list` - A slice of predicates, each matching a level of descent
+///
+/// # Returns
+/// The final node after following the token path, or None if any token wasn't found.
+///
+/// # Example
+/// ```ignore
+/// // Find: node -> child matching pred1 -> grandchild matching pred2
+/// let result = traverse_children(&node, &[
+///     |id| id == SomeToken::Foo as u16,
+///     |id| id == SomeToken::Bar as u16,
+/// ]);
+/// ```
+pub fn traverse_children<'a, F>(node: &Node<'a>, token_list: &[F]) -> Option<Node<'a>>
+where
+    F: Fn(u16) -> bool,
+{
+    let mut current = *node;
+    'outer: for token in token_list {
+        for child in current.children() {
+            if token(child.kind_id()) {
+                current = child;
+                continue 'outer;
+            }
+        }
+        // Token not found at this level
+        return None;
+    }
+    Some(current)
+}
+
 /// Checks if a node has specific ancestors in sequence.
 ///
 /// This macro checks if the node's ancestors match a specific pattern,

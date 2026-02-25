@@ -209,6 +209,26 @@ impl<'a> Node<'a> {
         }
         false
     }
+
+    // Traverse a tree passing from children to children in search of a specific
+    // token or series of tokens
+    pub(crate) fn traverse_children<F>(&self, token_list: &[F]) -> Option<Node<'a>>
+    where
+        F: FnOnce(u16) -> bool + Copy,
+    {
+        let mut node = *self;
+        'outer: for token in token_list {
+            for temp_node in node.children() {
+                if token(temp_node.kind_id()) {
+                    node = temp_node;
+                    continue 'outer;
+                }
+            }
+            // If a token has not been found, return None
+            return None;
+        }
+        Some(node)
+    }
 }
 
 /// An `AST` cursor.

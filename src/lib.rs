@@ -86,7 +86,7 @@ pub use crate::ast::*;
 
 /// AST traversal and analysis utilities.
 pub mod asttools;
-pub use crate::asttools::get_parent;
+pub use crate::asttools::{get_parent, traverse_children};
 
 mod count;
 pub use crate::count::*;
