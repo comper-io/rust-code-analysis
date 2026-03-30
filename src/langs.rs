@@ -133,7 +133,7 @@ mk_langs!(
         "perl",
         PerlCode,
         PerlParser,
-        tree_sitter_perl,
+        ts_parser_perl,
         [pl, pm, t, pod],
         ["perl", "cperl"]
     ),
