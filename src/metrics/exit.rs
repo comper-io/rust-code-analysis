@@ -182,6 +182,16 @@ impl Exit for JavaCode {
     }
 }
 
+implement_metric_trait!(Exit, PreprocCode, CcommentCode);
+
+impl Exit for KotlinCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        if matches!(node.kind_id().into(), Kotlin::Return) {
+            stats.exit += 1;
+        }
+    }
+}
+
 impl Exit for PhpCode {
     fn compute(node: &Node, stats: &mut Stats) {
         use Php::*;
@@ -215,14 +225,7 @@ impl Exit for PerlCode {
     }
 }
 
-implement_metric_trait!(
-    Exit,
-    KotlinCode,
-    PreprocCode,
-    CcommentCode,
-    HtmlCode,
-    CssCode
-);
+implement_metric_trait!(Exit, HtmlCode, CssCode);
 
 #[cfg(test)]
 mod tests {
@@ -353,13 +356,14 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nexits,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -379,13 +383,14 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nexits,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 0.5,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 0.5,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );

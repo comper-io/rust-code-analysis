@@ -438,31 +438,30 @@ impl Getter for CppCode {
                     return std::str::from_utf8(code).ok();
                 }
                 // we're in a function_definition so need to get the declarator
-                if let Some(declarator) = node.child_by_field_name("declarator") {
-                    let declarator_node = declarator;
-                    if let Some(fd) = declarator_node.first_occurrence(|id| {
+                if let Some(declarator) = node.child_by_field_name("declarator")
+                    && let Some(fd) = declarator.first_occurrence(|id| {
                         Cpp::FunctionDeclarator == id
                             || Cpp::FunctionDeclarator2 == id
                             || Cpp::FunctionDeclarator3 == id
-                    }) && let Some(first) = fd.child(0)
-                    {
-                        match first.kind_id().into() {
-                            Cpp::TypeIdentifier
-                            | Cpp::Identifier
-                            | Cpp::FieldIdentifier
-                            | Cpp::DestructorName
-                            | Cpp::OperatorName
-                            | Cpp::QualifiedIdentifier
-                            | Cpp::QualifiedIdentifier2
-                            | Cpp::QualifiedIdentifier3
-                            | Cpp::QualifiedIdentifier4
-                            | Cpp::TemplateFunction
-                            | Cpp::TemplateMethod => {
-                                let code = &code[first.start_byte()..first.end_byte()];
-                                return std::str::from_utf8(code).ok();
-                            }
-                            _ => {}
+                    })
+                    && let Some(first) = fd.child(0)
+                {
+                    match first.kind_id().into() {
+                        Cpp::TypeIdentifier
+                        | Cpp::Identifier
+                        | Cpp::FieldIdentifier
+                        | Cpp::DestructorName
+                        | Cpp::OperatorName
+                        | Cpp::QualifiedIdentifier
+                        | Cpp::QualifiedIdentifier2
+                        | Cpp::QualifiedIdentifier3
+                        | Cpp::QualifiedIdentifier4
+                        | Cpp::TemplateFunction
+                        | Cpp::TemplateMethod => {
+                            let code = &code[first.start_byte()..first.end_byte()];
+                            return std::str::from_utf8(code).ok();
                         }
+                        _ => {}
                     }
                 }
             }
@@ -575,7 +574,55 @@ impl Getter for JavaCode {
     }
 }
 
-impl Getter for KotlinCode {}
+impl Getter for KotlinCode {
+    fn get_space_kind(node: &Node) -> SpaceKind {
+        use Kotlin::*;
+
+        let typ = node.kind_id().into();
+        match typ {
+            ClassDeclaration => SpaceKind::Class,
+            FunctionDeclaration | Constructor | AnnotatedLambda => SpaceKind::Function,
+            SourceFile => SpaceKind::Unit,
+            _ => SpaceKind::Unknown,
+        }
+    }
+
+    fn get_op_type(node: &Node) -> HalsteadType {
+        use Kotlin::*;
+
+        let typ = node.kind_id();
+
+        match typ.into() {
+            // Operator: function calls
+            CallExpression
+            // Operator: control flow
+            | If | Else | When | Try | Catch | Throw | For | While | Continue | Break | Do | Finally
+            // Operator: keywords
+            | Return | Abstract | Final | Super | This
+            // Operator: brackets and comma and terminators (separators)
+            | SEMI | COMMA | COLONCOLON | LBRACE | LBRACK | LPAREN | RBRACE | RBRACK | RPAREN | DOTDOT | DOT
+            // Operator: operators
+            | EQ | LT | GT | BANG | QMARKCOLON | AsQMARK | COLON // no grammar for lambda operator ->
+            | EQEQ | LTEQ | GTEQ | BANGEQ | AMPAMP | PIPEPIPE | PLUSPLUS | DASHDASH
+            | PLUS | DASH | STAR | SLASH | PERCENT
+            | PLUSEQ | DASHEQ | STAREQ | SLASHEQ |  PERCENTEQ => {
+                HalsteadType::Operator
+            }
+            // Operands: variables, constants, literals
+            // StringLiteral covers both line strings and multi-line strings in this grammar
+            RealLiteral | IntegerLiteral | HexLiteral | BinLiteral | CharacterLiteralToken1 | UniCharacterLiteralToken1
+            | LiteralConstant | StringLiteral | StringContent | LambdaLiteral | FunctionLiteral
+            | ObjectLiteral | UnsignedLiteral | LongLiteral | BooleanLiteral | CharacterLiteral => {
+                HalsteadType::Operand
+            },
+            _ => {
+                HalsteadType::Unknown
+            },
+        }
+    }
+
+    get_operator!(Kotlin);
+}
 
 impl Getter for HtmlCode {
     fn get_space_kind(node: &Node) -> SpaceKind {

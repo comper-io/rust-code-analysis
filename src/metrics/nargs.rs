@@ -193,6 +193,15 @@ fn compute_args<T: Checker>(node: &Node, nargs: &mut usize) {
     }
 }
 
+#[inline(always)]
+fn compute_kotlin_args(node: &Node, nargs: &mut usize) {
+    node.act_on_child(&mut |n| {
+        if n.kind_id() == Kotlin::Parameter {
+            *nargs += 1;
+        }
+    });
+}
+
 pub trait NArgs
 where
     Self: Checker,
@@ -309,6 +318,18 @@ impl NArgs for PerlCode {
     }
 }
 
+impl NArgs for KotlinCode {
+    fn compute(node: &Node, stats: &mut Stats) {
+        if Self::is_func(node) {
+            compute_kotlin_args(node, &mut stats.fn_nargs);
+        }
+
+        if Self::is_closure(node) {
+            compute_kotlin_args(node, &mut stats.closure_nargs);
+        }
+    }
+}
+
 implement_metric_trait!(
     [NArgs],
     PythonCode,
@@ -320,7 +341,6 @@ implement_metric_trait!(
     PreprocCode,
     CcommentCode,
     JavaCode,
-    KotlinCode,
     PhpCode,
     CsharpCode
 );
@@ -434,19 +454,20 @@ mod tests {
                 // 1 function
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 2.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 2.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.0,
+                  "average_closures": 0.0,
+                  "total": 2.0,
+                  "average": 2.0,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -525,19 +546,20 @@ mod tests {
                 // 1 function
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 2.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 2.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.0,
+                  "average_closures": 0.0,
+                  "total": 2.0,
+                  "average": 2.0,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -549,19 +571,20 @@ mod tests {
             // 1 lambda
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 1.0,
-                      "average_functions": 0.0,
-                      "average_closures": 1.0,
-                      "total": 1.0,
-                      "average": 1.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 1.0,
-                      "closures_max": 1.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 1.0,
+              "average_functions": 0.0,
+              "average_closures": 1.0,
+              "total": 1.0,
+              "average": 1.0,
+              "functions_min": 0.0,
+              "functions_max": 0.0,
+              "closures_min": 1.0,
+              "closures_max": 1.0
+            }
+            "#
             );
         });
     }
@@ -622,19 +645,20 @@ mod tests {
             // 1 lambda
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 2.0,
-                      "average_functions": 0.0,
-                      "average_closures": 2.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 0.0,
-                      "closures_max": 2.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 2.0,
+              "average_functions": 0.0,
+              "average_closures": 2.0,
+              "total": 2.0,
+              "average": 2.0,
+              "functions_min": 0.0,
+              "functions_max": 0.0,
+              "closures_min": 0.0,
+              "closures_max": 2.0
+            }
+            "#
             );
         });
     }
@@ -653,19 +677,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 4.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 4.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 4.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.0,
+                  "average_closures": 0.0,
+                  "total": 4.0,
+                  "average": 2.0,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -682,19 +707,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 5.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.5,
-                      "average_closures": 0.0,
-                      "total": 5.0,
-                      "average": 2.5,
-                      "functions_min": 0.0,
-                      "functions_max": 3.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 5.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.5,
+                  "average_closures": 0.0,
+                  "total": 5.0,
+                  "average": 2.5,
+                  "functions_min": 0.0,
+                  "functions_max": 3.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -852,19 +878,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 4.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 4.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 4.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.0,
+                  "average_closures": 0.0,
+                  "total": 4.0,
+                  "average": 2.0,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -881,19 +908,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 5.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.5,
-                      "average_closures": 0.0,
-                      "total": 5.0,
-                      "average": 2.5,
-                      "functions_min": 0.0,
-                      "functions_max": 3.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 5.0,
+                  "total_closures": 0.0,
+                  "average_functions": 2.5,
+                  "average_closures": 0.0,
+                  "total": 5.0,
+                  "average": 2.5,
+                  "functions_min": 0.0,
+                  "functions_max": 3.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -913,19 +941,20 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 3.0,
-                      "total_closures": 2.0,
-                      "average_functions": 1.5,
-                      "average_closures": 1.0,
-                      "total": 5.0,
-                      "average": 1.25,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 3.0,
+                  "total_closures": 2.0,
+                  "average_functions": 1.5,
+                  "average_closures": 1.0,
+                  "total": 5.0,
+                  "average": 1.25,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -1012,19 +1041,20 @@ mod tests {
                 // 3 functions + 1 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 6.0,
-                      "total_closures": 1.0,
-                      "average_functions": 2.0,
-                      "average_closures": 1.0,
-                      "total": 7.0,
-                      "average": 1.75,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 6.0,
+                  "total_closures": 1.0,
+                  "average_functions": 2.0,
+                  "average_closures": 1.0,
+                  "total": 7.0,
+                  "average": 1.75,
+                  "functions_min": 0.0,
+                  "functions_max": 2.0,
+                  "closures_min": 0.0,
+                  "closures_max": 1.0
+                }
+                "#
                 );
             },
         );

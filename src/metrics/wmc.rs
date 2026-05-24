@@ -140,18 +140,16 @@ impl Wmc for CsharpCode {
     fn compute(_space_kind: SpaceKind, _cyclomatic: &cyclomatic::Stats, _stats: &mut Stats) {}
 }
 
-impl Wmc for JavaCode {
-    fn compute(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats) {
-        use SpaceKind::*;
+fn compute_wmc(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats) {
+    use SpaceKind::*;
 
-        if let Unit | Class | Interface | Function = space_kind {
-            if stats.space_kind == Unknown {
-                stats.space_kind = space_kind;
-            }
-            if space_kind == Function {
-                // Saves the cyclomatic complexity of the method
-                stats.cyclomatic = cyclomatic.cyclomatic_sum();
-            }
+    if let Unit | Class | Interface | Function = space_kind {
+        if stats.space_kind == Unknown {
+            stats.space_kind = space_kind;
+        }
+        if space_kind == Function {
+            // Saves the cyclomatic complexity of the method
+            stats.cyclomatic = cyclomatic.cyclomatic_sum();
         }
     }
 }
@@ -167,9 +165,20 @@ implement_metric_trait!(
     CppCode,
     PreprocCode,
     CcommentCode,
-    KotlinCode,
     PerlCode
 );
+
+impl Wmc for JavaCode {
+    fn compute(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats) {
+        compute_wmc(space_kind, cyclomatic, stats)
+    }
+}
+
+impl Wmc for KotlinCode {
+    fn compute(space_kind: SpaceKind, cyclomatic: &cyclomatic::Stats, stats: &mut Stats) {
+        compute_wmc(space_kind, cyclomatic, stats)
+    }
+}
 
 #[cfg(test)]
 mod tests {

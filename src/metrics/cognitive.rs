@@ -318,11 +318,11 @@ impl Cognitive for RustCode {
             IfExpression => {
                 // Check if a node is not an else-if
                 if !Self::is_else_if(node) {
-                    increase_nesting(stats,&mut nesting, depth, lambda);
+                    increase_nesting(stats, &mut nesting, depth, lambda);
                 }
             }
             ForExpression | WhileExpression | MatchExpression => {
-                increase_nesting(stats,&mut nesting, depth, lambda);
+                increase_nesting(stats, &mut nesting, depth, lambda);
             }
             Else /*else-if also */ => {
                 increment_by_one(stats);
@@ -368,11 +368,11 @@ impl Cognitive for CppCode {
         match node.kind_id().into() {
             IfStatement => {
                 if !Self::is_else_if(node) {
-                    increase_nesting(stats,&mut nesting, depth, lambda);
+                    increase_nesting(stats, &mut nesting, depth, lambda);
                 }
             }
             ForStatement | WhileStatement | DoStatement | SwitchStatement | CatchClause => {
-                increase_nesting(stats,&mut nesting, depth, lambda);
+                increase_nesting(stats, &mut nesting, depth, lambda);
             }
             GotoStatement | Else /* else-if also */ => {
                 increment_by_one(stats);
@@ -401,11 +401,11 @@ macro_rules! js_cognitive {
             match node.kind_id().into() {
                 IfStatement => {
                     if !Self::is_else_if(&node) {
-                        increase_nesting(stats,&mut nesting, depth, lambda);
+                        increase_nesting(stats, &mut nesting, depth, lambda);
                     }
                 }
                 ForStatement | ForInStatement | WhileStatement | DoStatement | SwitchStatement | CatchClause | TernaryExpression => {
-                    increase_nesting(stats,&mut nesting, depth, lambda);
+                    increase_nesting(stats, &mut nesting, depth, lambda);
                 }
                 Else /* else-if also */ => {
                     increment_by_one(stats);
@@ -466,11 +466,11 @@ impl Cognitive for JavaCode {
         match node.kind_id().into() {
             IfStatement => {
                 if !Self::is_else_if(node) {
-                    increase_nesting(stats,&mut nesting, depth, lambda);
+                    increase_nesting(stats, &mut nesting, depth, lambda);
                 }
             }
             ForStatement | WhileStatement | DoStatement | SwitchBlock | CatchClause => {
-                increase_nesting(stats,&mut nesting, depth, lambda);
+                increase_nesting(stats, &mut nesting, depth, lambda);
             }
             Else /* else-if also */ => {
                 increment_by_one(stats);
@@ -613,10 +613,6 @@ impl Cognitive for PerlCode {
 
         match node.kind_id().into() {
             ConditionalStatement => {
-                // Check if it's if or unless
-                // If it has 'if' or 'unless' child?
-                // Actually, ConditionalStatement covers if/unless.
-                // We increase nesting for the statement itself.
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             Elsif | Else => {
@@ -626,12 +622,9 @@ impl Cognitive for PerlCode {
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             ConditionalExpression => {
-                // Ternary
                 increase_nesting(stats, &mut nesting, depth, lambda);
             }
             BinaryExpression => {
-                // Check for &&, ||, and, or
-                // We can use a custom logic here since compute_booleans is limited
                 for child in node.children() {
                     let kind = child.kind_id();
                     if kind == AMPAMP as u16 || kind == PIPEPIPE as u16 || kind == 102 /* and */ || kind == 103
@@ -659,7 +652,45 @@ impl Cognitive for PerlCode {
     }
 }
 
-implement_metric_trait!(Cognitive, PreprocCode, CcommentCode, KotlinCode);
+impl Cognitive for KotlinCode {
+    fn compute(
+        node: &Node,
+        stats: &mut Stats,
+        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    ) {
+        use Kotlin::*;
+
+        //TODO: Implement macros
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+
+        match node.kind_id().into() {
+            IfExpression => {
+                if !Self::is_else_if(node) {
+                    increase_nesting(stats, &mut nesting, depth, lambda);
+                }
+            }
+            ForStatement | WhileStatement | DoWhileStatement | WhenExpression | CatchBlock => {
+                increase_nesting(stats, &mut nesting, depth, lambda);
+            }
+            Else /* else-if also */ => {
+                increment_by_one(stats);
+            }
+            UnaryExpression => {
+                stats.boolean_seq.not_operator(node.kind_id());
+            }
+            BinaryExpression => {
+                compute_booleans::<language_kotlin::Kotlin>(node, stats, AMPAMP, PIPEPIPE);
+            }
+            LambdaLiteral => {
+                lambda += 1;
+            }
+            _ => {}
+        }
+        nesting_map.insert(node.id(), (nesting, depth, lambda));
+    }
+}
+
+implement_metric_trait!(Cognitive, PreprocCode, CcommentCode);
 
 #[cfg(test)]
 mod tests {
@@ -743,13 +774,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 4.0,
+                  "average": 4.0,
+                  "min": 0.0,
+                  "max": 4.0
+                }
+                "#
                 );
             },
         );
@@ -766,13 +798,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 1.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -789,13 +822,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 2.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -815,13 +849,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 4.0,
+                  "average": 4.0,
+                  "min": 0.0,
+                  "max": 4.0
+                }
+                "#
                 );
             },
         );
@@ -843,13 +878,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 6.0,
-                      "average": 6.0,
-                      "min": 0.0,
-                      "max": 6.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 6.0,
+                  "average": 6.0,
+                  "min": 0.0,
+                  "max": 6.0
+                }
+                "#
                 );
             },
         );
@@ -946,13 +982,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 2.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -1259,13 +1296,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 3.0,
+                  "average": 3.0,
+                  "min": 0.0,
+                  "max": 3.0
+                }
+                "#
                 );
             },
         );
@@ -1356,13 +1394,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 3.0,
+                  "average": 3.0,
+                  "min": 0.0,
+                  "max": 3.0
+                }
+                "#
                 );
             },
         );
@@ -1772,13 +1811,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 4.0,
+                  "average": 4.0,
+                  "min": 0.0,
+                  "max": 4.0
+                }
+                "#
                 );
             },
         );
@@ -1799,13 +1839,14 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 5.0,
-                      "average": 1.25,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 5.0,
+                  "average": 1.25,
+                  "min": 0.0,
+                  "max": 3.0
+                }
+                "#
                 );
             },
         );
@@ -1832,13 +1873,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 9.0,
-                      "average": 9.0,
-                      "min": 0.0,
-                      "max": 9.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 9.0,
+                  "average": 9.0,
+                  "min": 0.0,
+                  "max": 9.0
+                }
+                "#
                 );
             },
         );
@@ -1925,7 +1967,7 @@ mod tests {
     fn java_single_branch_function() {
         check_metrics::<JavaParser>(
             "class X {
-                public static void print(boolean a){  
+                public static void print(boolean a){
                 if(a){ // +1
                   System.out.println(\"test1\");
                 }
@@ -1952,7 +1994,7 @@ mod tests {
     fn java_multiple_branch_function() {
         check_metrics::<JavaParser>(
             "class X {
-              public static void print(boolean a, boolean b){  
+              public static void print(boolean a, boolean b){
                 if(a){ // +1
                   System.out.println(\"test1\");
                 }
@@ -1985,7 +2027,7 @@ mod tests {
     fn java_compound_conditions() {
         check_metrics::<JavaParser>(
             "class X {
-              public static void print(boolean a, boolean b, boolean c, boolean d){  
+              public static void print(boolean a, boolean b, boolean c, boolean d){
                 if(a && b){ // +2 (+1 &&)
                   System.out.println(\"test1\");
                 }
