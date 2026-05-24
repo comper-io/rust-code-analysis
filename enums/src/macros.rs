@@ -30,7 +30,7 @@ macro_rules! mk_get_language {
                 Lang::Ccomment => tree_sitter_ccomment::LANGUAGE.into(),
                 Lang::Cpp => tree_sitter_mozcpp::LANGUAGE.into(),
                 Lang::Mozjs => tree_sitter_mozjs::LANGUAGE.into(),
-                Lang::Perl => tree_sitter_perl::LANGUAGE.into(),
+                Lang::Perl => ts_parser_perl::LANGUAGE.into(),
                 Lang::Html => tree_sitter_html::LANGUAGE.into(),
                 Lang::Css => tree_sitter_css::LANGUAGE.into(),
                 Lang::Php => tree_sitter_php::LANGUAGE_PHP.into(),
