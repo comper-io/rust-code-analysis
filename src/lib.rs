@@ -115,6 +115,14 @@ pub use crate::parser::*;
 mod comment_rm;
 pub use crate::comment_rm::*;
 
+// Re-export tree-sitter for downstream crates (e.g. Comper diagram parsing).
+// Versions are owned by this crate's Cargo.toml — do not duplicate pins elsewhere.
+pub use tree_sitter;
+pub use tree_sitter_javascript;
+pub use tree_sitter_python;
+pub use tree_sitter_rust;
+pub use tree_sitter_typescript;
+
 /// Compute metrics for a Vue Single File Component by analyzing all sections
 /// and combining the LoC metrics.
 pub fn get_vue_metrics(source: Vec<u8>, path: &std::path::Path) -> Option<FuncSpace> {
