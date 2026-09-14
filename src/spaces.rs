@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 use serde::Serialize;
 use std::fmt;
@@ -293,11 +292,12 @@ pub fn metrics<'a, T: ParserTrait>(parser: &'a T, path: &'a Path) -> Option<Func
     let mut last_level = 0;
     // Initialize nesting_map used for storing nesting information for cognitive
     // Three type of nesting info: conditionals, functions and lambdas
-    let mut nesting_map = HashMap::<usize, (usize, usize, usize)>::default();
-    nesting_map.insert(node.id(), (0, 0, 0));
-    stack.push((node, 0));
+    let mut nesting_map = crate::metrics::cognitive::NestingMap::default();
+    stack.push((node, 0, (0, 0, 0)));
 
-    while let Some((node, level)) = stack.pop() {
+    while let Some((node, level, parent_nesting)) = stack.pop() {
+        nesting_map.parent = parent_nesting;
+        nesting_map.current = parent_nesting;
         if level < last_level {
             finalize::<T>(&mut state_stack, last_level - level);
             last_level = level;
@@ -337,7 +337,7 @@ pub fn metrics<'a, T: ParserTrait>(parser: &'a T, path: &'a Path) -> Option<Func
         cursor.reset(&node);
         if cursor.goto_first_child() {
             loop {
-                children.push((cursor.node(), new_level));
+                children.push((cursor.node(), new_level, nesting_map.current));
                 if !cursor.goto_next_sibling() {
                     break;
                 }

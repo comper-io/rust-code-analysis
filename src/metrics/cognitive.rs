@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 use serde::Serialize;
 use serde::ser::{SerializeStruct, Serializer};
@@ -128,7 +127,7 @@ where
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     );
 }
 
@@ -191,19 +190,20 @@ fn increment_by_one(stats: &mut Stats) {
     stats.structural += 1;
 }
 
-fn get_nesting_from_map(
-    node: &Node,
-    nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
-) -> (usize, usize, usize) {
-    if let Some(parent) = node.parent() {
-        if let Some(n) = nesting_map.get(&parent.id()) {
-            *n
-        } else {
-            (0, 0, 0)
-        }
-    } else {
-        (0, 0, 0)
+#[derive(Debug, Default, Clone)]
+pub struct NestingMap {
+    pub parent: (usize, usize, usize),
+    pub current: (usize, usize, usize),
+}
+
+impl NestingMap {
+    pub fn insert(&mut self, _id: usize, value: (usize, usize, usize)) {
+        self.current = value;
     }
+}
+
+fn get_nesting_from_map(_node: &Node, nesting_map: &mut NestingMap) -> (usize, usize, usize) {
+    nesting_map.parent
 }
 
 fn increment_function_depth<T: std::cmp::PartialEq + std::convert::From<u16>>(
@@ -234,7 +234,7 @@ impl Cognitive for PythonCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Python::*;
 
@@ -308,7 +308,7 @@ impl Cognitive for RustCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Rust::*;
         //TODO: Implement macros
@@ -358,7 +358,7 @@ impl Cognitive for CppCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Cpp::*;
 
@@ -394,7 +394,7 @@ impl Cognitive for CppCode {
 
 macro_rules! js_cognitive {
     ($lang:ident) => {
-        fn compute(node: &Node, stats: &mut Stats, nesting_map: &mut HashMap<usize, (usize, usize, usize)>) {
+        fn compute(node: &Node, stats: &mut Stats, nesting_map: &mut NestingMap) {
             use $lang::*;
             let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
@@ -457,7 +457,7 @@ impl Cognitive for JavaCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Java::*;
 
