@@ -494,7 +494,7 @@ impl Cognitive for HtmlCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Html::*;
 
@@ -515,7 +515,7 @@ impl Cognitive for CssCode {
     fn compute(
         _node: &Node,
         _stats: &mut Stats,
-        _nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        _nesting_map: &mut NestingMap,
     ) {
         // CSS has no control flow
     }
@@ -525,7 +525,7 @@ impl Cognitive for PhpCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Php::*;
 
@@ -565,7 +565,7 @@ impl Cognitive for CsharpCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Csharp::*;
 
@@ -605,7 +605,7 @@ impl Cognitive for PerlCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use crate::languages::Perl::*;
 
@@ -656,7 +656,7 @@ impl Cognitive for KotlinCode {
     fn compute(
         node: &Node,
         stats: &mut Stats,
-        nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+        nesting_map: &mut NestingMap,
     ) {
         use Kotlin::*;
 
